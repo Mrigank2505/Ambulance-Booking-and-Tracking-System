@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Driver Cockpit Login - RESQCARE</title>
+  <meta name="description" content="Dedicated mission control portal for certified emergency ambulance drivers and mobile paramedic pilots.">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    .driver-auth-container {
+      max-width: 480px;
+      margin: 3.5rem auto 4rem auto;
+      padding: 0 1rem;
+    }
+    .driver-card {
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-top: 5px solid #059669;
+      border-radius: var(--radius-md);
+      box-shadow: 0 15px 30px -10px rgba(15, 23, 42, 0.18);
+      padding: 2.25rem;
+    }
+    .driver-badge {
+      margin: 0 auto 1rem auto;
+      width: 52px;
+      height: 52px;
+      border-radius: 12px;
+      background: #ecfdf5;
+      color: #059669;
+      font-weight: 800;
+      font-size: 1.15rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid #a7f3d0;
+    }
+    .password-field-container {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .password-field-container input {
+      padding-right: 4.5rem;
+    }
+    .password-toggle-btn {
+      position: absolute;
+      right: 0.5rem;
+      background: transparent;
+      border: none;
+      color: #64748b;
+      font-size: 0.825rem;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 0.35rem 0.6rem;
+      border-radius: 4px;
+      transition: background-color 0.15s ease, color 0.15s ease;
+    }
+    .password-toggle-btn:hover {
+      background: #f1f5f9;
+      color: #0f172a;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Fixed Navigation Bar -->
+  <div id="navbar-container"></div>
+
+  <main class="container driver-auth-container">
+    <div class="driver-card">
+      <div style="text-align: center; margin-bottom: 2rem;">
+        <div class="driver-badge" aria-hidden="true">
+          <svg style="width: 26px; height: 26px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"></path>
+          </svg>
+        </div>
+        <h1 style="font-size: 1.45rem; font-weight: 800; color: #0f172a; margin: 0 0 0.35rem 0;">
+          Driver Cockpit Sign In
+        </h1>
+        <p style="color: #64748b; font-size: 0.875rem; margin: 0;">
+          Emergency ambulance drivers & paramedic pilots: sign in to receive dispatch orders and telemetry missions.
+        </p>
+      </div>
+
+      <!-- Security / Alert Container -->
+      <div id="driver-login-alert" class="alert alert-danger" style="display: none; margin-bottom: 1.25rem;" role="alert"></div>
+
+      <form id="driver-login-form" novalidate>
+        <div class="form-group">
+          <label class="form-label" for="driver-identifier">Driver ID, Username, or Registered Email</label>
+          <input 
+            type="text" 
+            id="driver-identifier" 
+            name="email"
+            class="form-control" 
+            placeholder="e.g. driver.mike@ambulance.com" 
+            required 
+            autofocus 
+            autocomplete="username"
+          >
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="driver-password">Pilot Security Password</label>
+          <div class="password-field-container">
+            <input 
+              type="password" 
+              id="driver-password" 
+              name="password"
+              class="form-control" 
+              placeholder="••••••••" 
+              required 
+              autocomplete="current-password"
+            >
+            <button 
+              type="button" 
+              id="btn-toggle-driver-password" 
+              class="password-toggle-btn" 
+              aria-label="Toggle password visibility" 
+              onclick="toggleDriverPassword()"
+            >
+              Show
+            </button>
+          </div>
+        </div>
+
+        <button type="submit" id="btn-driver-submit" class="btn btn-primary" style="width: 100%; margin-top: 0.5rem; padding: 0.8rem; font-weight: 700; background: #059669; border-color: #059669;">
+          Sign In to Driver Cockpit
+        </button>
+      </form>
+
+      <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 0.85rem; margin-top: 1.75rem; font-size: 0.8rem; color: #64748b; line-height: 1.5;">
+        <strong style="color: #0f172a; display: block; margin-bottom: 0.2rem;">Fleet Dispatch Requirements</strong>
+        Drivers must maintain mobile GPS active. Once logged in, switch status to ONLINE to accept incoming emergency dispatch requests.
+      </div>
+
+      <div style="text-align: center; margin-top: 1.25rem; font-size: 0.85rem; color: #64748b;">
+        <a href="login.html" style="color: #1e3a8a; font-weight: 600; text-decoration: none;">&larr; Patient Portal</a>
+        <span style="margin: 0 0.5rem; color: #cbd5e1;">|</span>
+        <a href="admin-login.html" style="color: #1e3a8a; font-weight: 600; text-decoration: none;">Admin Portal &rarr;</a>
+      </div>
+    </div>
+  </main>
+
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/notifications.js"></script>
+  <script src="js/validation.js"></script>
+  <script src="js/ui.js"></script>
+  <script>
+    function toggleDriverPassword() {
+      const field = document.getElementById('driver-password');
+      const btn = document.getElementById('btn-toggle-driver-password');
+      if (!field || !btn) return;
+      if (field.type === 'password') {
+        field.type = 'text';
+        btn.textContent = 'Hide';
+        btn.setAttribute('aria-label', 'Hide password');
+      } else {
+        field.type = 'password';
+        btn.textContent = 'Show';
+        btn.setAttribute('aria-label', 'Show password');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // Check if user is already authenticated as DRIVER
+      if (Auth.isAuthenticated() && Auth.hasRole('DRIVER')) {
+        window.location.replace('driver-dashboard.html');
+        return;
+      }
+
+      UI.renderNavbar('driver-login');
+
+      let isSubmitting = false;
+      const form = document.getElementById('driver-login-form');
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (isSubmitting) return;
+
+        Validation.clearAllErrors(form);
+
+        const identifier = document.getElementById('driver-identifier').value.trim();
+        const password = document.getElementById('driver-password').value;
+        const alertEl = document.getElementById('driver-login-alert');
+        alertEl.style.display = 'none';
+
+        let isValid = true;
+        if (!identifier) {
+          Validation.showFieldError(document.getElementById('driver-identifier'), 'Please enter Driver ID or email');
+          isValid = false;
+        }
+        if (!password) {
+          Validation.showFieldError(document.getElementById('driver-password'), 'Please enter driver password');
+          isValid = false;
+        }
+
+        if (!isValid) return;
+
+        const submitBtn = document.getElementById('btn-driver-submit');
+        isSubmitting = true;
+        UI.setButtonLoading(submitBtn, true, 'Authenticating Driver...');
+
+        try {
+          const user = await Auth.login(identifier, password);
+
+          // Enforce role check: DRIVER (or ADMIN)
+          if (user.role !== 'DRIVER' && user.role !== 'ADMIN') {
+            Auth.clearSession();
+            isSubmitting = false;
+            UI.setButtonLoading(submitBtn, false);
+            alertEl.className = 'alert alert-danger';
+            alertEl.textContent = 'Access Denied: Certified Emergency Driver credentials required for Cockpit access.';
+            alertEl.style.display = 'block';
+            return;
+          }
+
+          UI.showToast(`Driver Authenticated. Welcome, Pilot ${user.fullName}!`, 'success');
+          setTimeout(() => {
+            window.location.replace('driver-dashboard.html');
+          }, 450);
+        } catch (err) {
+          isSubmitting = false;
+          UI.setButtonLoading(submitBtn, false);
+          alertEl.className = 'alert alert-danger';
+          alertEl.textContent = err.message || 'Invalid driver credentials. Please verify your driver ID and password.';
+          alertEl.style.display = 'block';
+        }
+      });
+    });
+  </script>
+</body>
+</html>

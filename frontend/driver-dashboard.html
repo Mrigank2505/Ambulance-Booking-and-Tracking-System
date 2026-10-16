@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Driver Cockpit - RESQCARE</title>
+  <meta name="description" content="Driver and paramedic interface for managing active ambulance dispatches and trip progression.">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 48px;
+      height: 26px;
+    }
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      inset: 0;
+      background-color: #cbd5e1;
+      transition: .3s;
+      border-radius: 34px;
+    }
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 20px;
+      width: 20px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .3s;
+      border-radius: 50%;
+    }
+    input:checked + .slider {
+      background-color: #059669;
+    }
+    input:checked + .slider:before {
+      transform: translateX(22px);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Dynamic Navbar -->
+  <div id="navbar-container"></div>
+
+  <div class="container" style="max-width: 960px; margin: 1.5rem auto 2.5rem auto;">
+    <!-- Pilot Header Card -->
+    <div class="card" style="margin-bottom: 1.25rem; border-top: 4px solid #1e3a8a; padding: 1.25rem;">
+      <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem;">
+        <div style="display: flex; align-items: center; gap: 1rem;">
+          <div style="width: 44px; height: 44px; background: #eff6ff; color: #1e3a8a; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.95rem; font-weight: 800;">
+            EMT
+          </div>
+          <div>
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <h2 id="driver-name" style="font-size: 1.15rem; font-weight: 800; color: #0f172a; margin: 0;">Driver Cockpit</h2>
+              <span id="driver-status-text"><span class="badge badge-online">ONLINE</span></span>
+            </div>
+            <p id="driver-license" style="font-size: 0.8125rem; color: #64748b; margin: 0.15rem 0 0 0;">License: Loading...</p>
+            <p id="driver-ambulance" style="font-size: 0.8125rem; color: #1e3a8a; font-weight: 600; margin: 0.15rem 0 0 0;">Assigned Unit: Loading...</p>
+          </div>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 0.75rem; background: #f8fafc; border: 1px solid #e2e8f0; padding: 0.5rem 0.85rem; border-radius: 8px;">
+          <span style="font-size: 0.845rem; font-weight: 700; color: #0f172a;">Ready for Duty:</span>
+          <label class="switch">
+            <input type="checkbox" id="driver-online-toggle" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Incoming Dispatch Queue -->
+    <div style="margin-bottom: 2.5rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <h3 style="font-size: 1.25rem; font-weight: 800; color: #0f172a;">
+          Incoming Emergency Dispatches (<span id="pending-count">0</span>)
+        </h3>
+        <span style="font-size: 0.8rem; color: #64748b;">Auto-refreshing every 5s</span>
+      </div>
+
+      <div id="pending-requests-container">
+        <div class="card" style="text-align: center; padding: 2rem; color: #64748b;">
+          Checking dispatch queue...
+        </div>
+      </div>
+    </div>
+
+    <!-- Active Mission Card -->
+    <div style="margin-bottom: 2.5rem;">
+      <h3 style="font-size: 1.25rem; font-weight: 800; color: #0f172a; margin-bottom: 1rem;">
+        Active In-Transit Mission
+      </h3>
+      <div id="active-trip-container">
+        <div class="card" style="text-align: center; padding: 2.5rem; color: #64748b;">
+          No active trip in progress.
+        </div>
+      </div>
+    </div>
+
+    <!-- Completed Trip Log -->
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Completed Trip History</h3>
+      </div>
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Reference</th>
+              <th>Patient</th>
+              <th>Destination</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="driver-history-tbody">
+            <tr>
+              <td colspan="5" style="text-align: center; color: #64748b; padding: 2rem;">Loading completed shifts...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/notifications.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/driver.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      DriverApp.init();
+    });
+  </script>
+</body>
+</html>

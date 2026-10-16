@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Dashboard - RESQCARE</title>
+  <meta name="description" content="Manage your active emergency ambulance requests, dispatch tracking, and past trip history.">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Dynamic Navbar -->
+  <div id="navbar-container"></div>
+
+  <div class="container" style="margin: 2.5rem auto 4rem auto;">
+    <!-- Welcome Header -->
+    <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: 2rem;">
+      <div>
+        <h1 style="font-size: 1.85rem; font-weight: 800; color: #0f172a;">Welcome, <span id="dash-user-name">Patient</span></h1>
+        <p id="dash-user-email" style="color: #64748b; font-size: 0.95rem;">Manage your emergency bookings and history</p>
+      </div>
+      <div>
+        <a href="booking.html" class="btn btn-danger btn-pulse">New Emergency Booking</a>
+      </div>
+    </div>
+
+    <!-- Quick Stats Cards -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.25rem; margin-bottom: 2rem;">
+      <div class="card" style="padding: 1.25rem; border-left: 4px solid #1e3a8a;">
+        <span style="font-size: 0.75rem; color: #64748b; text-transform: uppercase;">Total Bookings</span>
+        <div id="total-rides-count" style="font-size: 1.85rem; font-weight: 800; color: #1e3a8a; margin-top: 0.25rem;">0</div>
+      </div>
+      <div class="card" style="padding: 1.25rem; border-left: 4px solid #059669;">
+        <span style="font-size: 0.75rem; color: #64748b; text-transform: uppercase;">Completed Safely</span>
+        <div id="completed-rides-count" style="font-size: 1.85rem; font-weight: 800; color: #059669; margin-top: 0.25rem;">0</div>
+      </div>
+      <div class="card" style="padding: 1.25rem; border-left: 4px solid #dc2626;">
+        <span style="font-size: 0.75rem; color: #64748b; text-transform: uppercase;">Emergency Helpline</span>
+        <div style="font-size: 1.4rem; font-weight: 800; color: #dc2626; margin-top: 0.4rem;">
+          <a href="tel:108" style="color: inherit; text-decoration: none;">Helpline: 108</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active Booking Widget -->
+    <div style="margin-bottom: 2.5rem;">
+      <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 0.75rem; color: #0f172a;">Active Emergency Mission</h3>
+      <div id="active-booking-widget">
+        <div class="card" style="text-align: center; padding: 2rem; color: #64748b;">Checking active missions...</div>
+      </div>
+    </div>
+
+    <!-- Recent Bookings Table -->
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Recent Booking History</h3>
+        <a href="history.html" class="btn btn-outline btn-sm">View Full History</a>
+      </div>
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Reference Code</th>
+              <th>Patient</th>
+              <th>Destination</th>
+              <th>Emergency Type</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="recent-bookings-tbody">
+            <tr>
+              <td colspan="6" style="text-align: center; color: #64748b; padding: 2rem;">Loading bookings...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/notifications.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/dashboard.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      DashboardApp.init();
+    });
+  </script>
+</body>
+</html>

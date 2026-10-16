@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RESQCARE - Rapid Ambulance Booking & Real-Time Tracking</title>
+  <meta name="description" content="RESQCARE - Integrated emergency medical response platform: rapid ambulance booking, real-time GPS fleet tracking, and regional trauma center connectivity.">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="js/auth.js"></script>
+  <script>
+    if (!Auth.isAuthenticated()) {
+      window.location.replace('login.html?redirect=index.html');
+    }
+  </script>
+  <style>
+    .hero-section {
+      background: linear-gradient(135deg, #09152b 0%, #0f2b5c 55%, #1e3a8a 100%);
+      color: #ffffff;
+      padding: 2rem 0 1.75rem 0;
+      position: relative;
+    }
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 1.75rem;
+      align-items: center;
+    }
+    .hero-title {
+      font-size: 1.5rem; /* 24px within 22-26px range */
+      font-weight: 800;
+      line-height: 1.25;
+      margin-bottom: 0.65rem;
+      letter-spacing: -0.015em;
+      color: #ffffff;
+    }
+    .hero-title span {
+      color: #ef4444;
+    }
+    .hero-subtitle {
+      font-size: 0.85rem; /* ~13.6px within 13-14px range */
+      color: #cbd5e1;
+      line-height: 1.5;
+      margin-bottom: 1.25rem;
+      max-width: 560px;
+    }
+    .hero-btn-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.65rem;
+      align-items: center;
+      margin-bottom: 1.25rem;
+    }
+    .hero-features-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.25rem;
+      padding-top: 1rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.12);
+    }
+    .hero-feature-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.8125rem;
+      color: #cbd5e1;
+      font-weight: 500;
+    }
+    .hero-feature-item svg {
+      width: 15px;
+      height: 15px;
+      color: #38bdf8;
+      flex-shrink: 0;
+    }
+    .dispatch-card {
+      background: #ffffff;
+      color: #0f172a;
+      border-radius: var(--radius-md);
+      padding: 1.25rem;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.25);
+      border: 1px solid #e2e8f0;
+    }
+    .dispatch-unit-row {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 0.75rem 0.85rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      transition: border-color 0.15s ease;
+    }
+    .dispatch-unit-row:hover {
+      border-color: #cbd5e1;
+    }
+    .feature-card {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 1.25rem;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .feature-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+    .icon-badge {
+      width: 38px;
+      height: 38px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 0.75rem;
+    }
+    .step-circle {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.95rem;
+      margin: 0 auto 0.75rem auto;
+    }
+    @media (max-width: 992px) {
+      .hero-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+      .hero-title {
+        font-size: 1.4rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Fixed Navigation Bar -->
+  <div id="navbar-container"></div>
+
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="container hero-grid">
+      <!-- Left Column: Value Proposition & Emergency Action Buttons -->
+      <div>
+        <div style="display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(220, 38, 38, 0.2); border: 1px solid rgba(220, 38, 38, 0.4); padding: 0.35rem 0.85rem; border-radius: 99px; font-size: 0.8125rem; font-weight: 600; color: #fca5a5; margin-bottom: 1.25rem;">
+          <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #ef4444;"></span>
+          24/7 Rapid Emergency Response Network
+        </div>
+
+        <h1 class="hero-title">
+          Every Second Counts in an <span>Emergency</span>.
+        </h1>
+
+        <p class="hero-subtitle">
+          Book an ambulance, track its location in real time, and connect with nearby hospitals through one integrated emergency response platform.
+        </p>
+
+        <!-- Three Primary Buttons Requested in Spec -->
+        <div class="hero-btn-group">
+          <!-- Button 1: Book Ambulance Now -->
+          <a href="booking.html" class="btn btn-danger" style="font-weight: 700; padding: 0.55rem 1.1rem; font-size: 0.85rem;">
+            <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+            </svg>
+            Book Ambulance Now
+          </a>
+
+          <!-- Button 2: Track Location -->
+          <a href="tracking.html" class="btn" style="background: #1e3a8a; border: 1px solid #3b82f6; color: #ffffff; font-weight: 600; padding: 0.55rem 1rem; font-size: 0.85rem;">
+            <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+            </svg>
+            Track Location
+          </a>
+
+          <!-- Button 3: View Available Fleet -->
+          <a href="ambulances.html" class="btn btn-outline" style="color: #ffffff; border-color: rgba(255, 255, 255, 0.35); background: rgba(255, 255, 255, 0.08); font-weight: 600; padding: 0.55rem 1rem; font-size: 0.85rem;">
+            <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"></path>
+            </svg>
+            View Available Fleet
+          </a>
+        </div>
+
+        <!-- Capability Markers -->
+        <div class="hero-features-row">
+          <div class="hero-feature-item">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+            </svg>
+            Certified Paramedic Units
+          </div>
+          <div class="hero-feature-item">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            Real-Time GPS Telemetry
+          </div>
+          <div class="hero-feature-item">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+            </svg>
+            Regional Trauma Network
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Instant Dispatch Card -->
+      <div>
+        <div class="dispatch-card">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+            <h2 style="font-size: 1.05rem; font-weight: 700; color: #0f172a; margin: 0;">Instant Dispatch</h2>
+            <span class="badge badge-critical" style="font-size: 0.7rem; padding: 0.2rem 0.5rem;">PRIORITY QUEUE</span>
+          </div>
+          <p style="color: #64748b; font-size: 0.8125rem; margin-bottom: 1rem; line-height: 1.45;">
+            Immediate GPS triangulation connects you directly with the nearest active response unit.
+          </p>
+
+          <div style="display: flex; flex-direction: column; gap: 0.65rem; margin-bottom: 1.15rem;">
+            <div class="dispatch-unit-row">
+              <div>
+                <strong style="color: #0f172a; display: block; font-size: 0.85rem;">ICU Critical Care Ambulances</strong>
+                <span style="font-size: 0.775rem; color: #475569;">Mobile ICU with ventilators & physician standby</span>
+              </div>
+              <span class="badge badge-available" style="font-size: 0.7rem;">AVAILABLE</span>
+            </div>
+
+            <div class="dispatch-unit-row">
+              <div>
+                <strong style="color: #0f172a; display: block; font-size: 0.85rem;">Advanced Life Support (ALS)</strong>
+                <span style="font-size: 0.775rem; color: #475569;">Cardiac defibrillator & paramedic crew</span>
+              </div>
+              <span class="badge badge-available" style="font-size: 0.7rem;">AVAILABLE</span>
+            </div>
+          </div>
+
+          <a href="booking.html" class="btn btn-primary" style="width: 100%; text-align: center; justify-content: center; font-weight: 700; padding: 0.6rem; font-size: 0.85rem;">
+            Enter Patient Pickup Details
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       PROMINENT BOOK AMBULANCE SECTION
+       ==================================================================== -->
+  <section id="book-ambulance-section" class="home-booking-section">
+    <div class="container">
+      <div class="home-booking-card">
+        <div class="home-booking-grid">
+          <div>
+            <div class="section-tag-red">
+              <span class="live-dot-red"></span>
+              Emergency Dispatch Network
+            </div>
+            <h2 class="home-booking-title">
+              Instant <span>Ambulance Booking</span> & Rapid Response
+            </h2>
+            <p class="home-booking-desc">
+              Connect immediately with nearby response crews through our smart dispatch pipeline. Choose life-support specifications and dispatch an emergency vehicle to your exact pickup location.
+            </p>
+            <div class="home-amb-tiers-grid">
+              <!-- Tier 1: ICU -->
+              <a href="booking.html?type=ICU" class="home-amb-tier-card">
+                <div class="tier-top">
+                  <strong>Critical Care / ICU</strong>
+                  <span class="badge badge-critical" style="font-size: 0.65rem;">VENTILATOR</span>
+                </div>
+                <p>Equipped with mobile ICU ventilator, multipara monitor & emergency physician standby.</p>
+                <span class="tier-action">Book ICU &rarr;</span>
+              </a>
+
+              <!-- Tier 2: ALS -->
+              <a href="booking.html?type=ALS" class="home-amb-tier-card">
+                <div class="tier-top">
+                  <strong>Advanced Life Support</strong>
+                  <span class="badge badge-serious" style="font-size: 0.65rem;">ALS</span>
+                </div>
+                <p>Equipped with cardiac defibrillator, IV medication kit & certified paramedic crew.</p>
+                <span class="tier-action">Book ALS &rarr;</span>
+              </a>
+
+              <!-- Tier 3: Basic -->
+              <a href="booking.html?type=BASIC" class="home-amb-tier-card">
+                <div class="tier-top">
+                  <strong>Basic Ambulance</strong>
+                  <span class="badge badge-normal" style="font-size: 0.65rem;">BLS</span>
+                </div>
+                <p>First-aid supplies, patient stretcher, portable oxygen & basic vitals support.</p>
+                <span class="tier-action">Book Basic &rarr;</span>
+              </a>
+            </div>
+          </div>
+
+          <div class="home-booking-cta-col">
+            <div class="home-cta-box">
+              <div class="cta-pulse-badge">24/7 Priority Emergency Queue</div>
+              <h3>Need Immediate Dispatch?</h3>
+              <p>Launch the verified ambulance booking form to enter patient pickup details and track dispatch telemetry live.</p>
+              <a href="booking.html" id="btn-home-book-ambulance" class="btn btn-danger btn-lg btn-pulse home-primary-book-btn">
+                <svg style="width: 18px; height: 18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                </svg>
+                Book Ambulance Now
+              </a>
+              <div class="home-cta-guarantees">
+                <span>&#10003; Automated nearest unit Haversine allocation</span>
+                <span>&#10003; Real-time GPS coordinates & turn-by-turn ETA</span>
+                <span>&#10003; Direct trauma center bed coordination</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       HOSPITALS & TRAUMA CENTERS SECTION
+       ==================================================================== -->
+  <section id="hospitals-section" class="home-hospitals-section">
+    <div class="container">
+      <div class="section-header-row">
+        <div>
+          <div class="section-tag-blue">
+            <svg style="width: 14px; height: 14px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+            </svg>
+            Medical Network Directory
+          </div>
+          <h2 class="section-main-title">Nearby Hospitals & Trauma Centers</h2>
+          <p class="section-main-desc">
+            Verified regional emergency departments, cardiac wings, and intensive care capacities retrieved live from our medical database for direct ambulance coordination.
+          </p>
+        </div>
+        <div class="section-header-actions">
+          <a href="booking.html" class="btn btn-danger btn-sm" style="font-weight: 700;">
+            <svg style="width: 15px; height: 15px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+            </svg>
+            Book Ambulance
+          </a>
+          <button type="button" id="home-sort-distance-btn" onclick="HomeHospitals.useLocationFilter()" class="btn btn-outline btn-sm" style="font-weight: 600;">
+            <svg style="width: 14px; height: 14px; color: #1e3a8a;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+            </svg>
+            Sort by Distance
+          </button>
+        </div>
+      </div>
+
+      <!-- 10 KM Radius Banner -->
+      <div id="home-radius-banner" style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: var(--radius-md); padding: 0.85rem 1.15rem; margin-bottom: 1.25rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.65rem;">
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <span style="background: #dbeafe; color: #1e40af; font-size: 0.725rem; font-weight: 700; padding: 2px 8px; border-radius: 9999px;">
+            10 KM RADIUS
+          </span>
+          <strong id="home-radius-banner-text" style="color: #1e3a8a; font-size: 0.925rem;">
+            Showing hospitals within 10 km of your pickup location.
+          </strong>
+        </div>
+        <div id="home-pickup-display" style="font-size: 0.8rem; color: #2563eb; font-weight: 600;">
+          Pickup Reference: <span id="home-pickup-label">100 Medical Square, Central District</span> 
+          (<span id="home-pickup-coords" style="font-family: monospace;">12.9716, 77.5946</span>)
+        </div>
+      </div>
+
+      <!-- Quick Filter & Search Bar with Pickup Location -->
+      <div class="home-hospitals-filter-card">
+        <div style="display: grid; grid-template-columns: 2fr 1fr auto; gap: 1rem; align-items: flex-end; margin-bottom: 1rem;">
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label" for="home-pickup-input">Pickup Address / Landmark</label>
+            <div class="search-input-wrapper">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+              </svg>
+              <input 
+                type="text" 
+                id="home-pickup-input" 
+                class="form-control" 
+                placeholder="Enter pickup address, landmark, or coordinates..."
+                value="100 Medical Square, Central District"
+                autocomplete="off"
+                oninput="HomeHospitals.handlePickupInput(this.value)"
+              >
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label" for="home-radius-select">Search Radius</label>
+            <select id="home-radius-select" class="form-control" onchange="HomeHospitals.changeRadius(this.value)">
+              <option value="10.0" selected>10 km (Standard)</option>
+              <option value="15.0">15 km</option>
+              <option value="20.0">20 km</option>
+              <option value="35.0">35 km</option>
+            </select>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label" style="opacity: 0; pointer-events: none; display: block; margin-bottom: 0.4rem;">GPS</label>
+            <button 
+              type="button" 
+              id="home-use-gps-btn" 
+              onclick="HomeHospitals.useLocationFilter()" 
+              class="btn btn-outline" 
+              style="width: 100%; height: 42px; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; font-weight: 600; white-space: nowrap; border-color: #3b82f6; color: #1e3a8a;"
+            >
+              <svg style="width: 15px; height: 15px; color: #2563eb;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              Use GPS
+            </button>
+          </div>
+        </div>
+
+        <div class="home-filter-grid">
+          <!-- Search Field -->
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label" for="home-search-hospital">Search Within Radius</label>
+            <div class="search-input-wrapper">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+              </svg>
+              <input 
+                type="text" 
+                id="home-search-hospital" 
+                class="form-control" 
+                placeholder="Filter by hospital name..."
+                autocomplete="off"
+              >
+            </div>
+          </div>
+
+          <!-- ICU Bed Filter -->
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label" for="home-filter-icu">ICU Bed Availability</label>
+            <select id="home-filter-icu" class="form-control">
+              <option value="">All Emergency Hospitals</option>
+              <option value="true">ICU Critical Beds Available Only</option>
+            </select>
+          </div>
+
+          <!-- Facilities Counter & Live Status -->
+          <div class="home-filter-status">
+            <span id="home-facilities-count-text">Loading medical directory...</span>
+            <span id="home-location-status-badge" class="home-gps-badge">
+              <span class="live-dot-green"></span>
+              Distance &le; 10 km Filtered
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hospitals Grid -->
+      <div id="home-hospitals-grid" class="home-hospitals-grid" aria-live="polite">
+        <div style="grid-column: 1 / -1; text-align: center; padding: 3rem 1.5rem; background: #ffffff; border: 1px solid var(--border); border-radius: var(--radius-md);">
+          <div class="spinner" style="margin: 0 auto 1rem auto;"></div>
+          <h4 style="font-size: 1.1rem; font-weight: 700; color: #0f172a; margin-bottom: 0.35rem;">Connecting to Medical Database...</h4>
+          <p style="color: #64748b; font-size: 0.85rem; margin: 0;">Fetching nearby emergency facilities and verified trauma availability.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Core Services & Capabilities -->
+  <section style="padding: 2.25rem 0; background: #ffffff;">
+    <div class="container">
+      <div style="text-align: center; max-width: 680px; margin: 0 auto 1.75rem auto;">
+        <span style="font-size: 0.775rem; font-weight: 700; color: #1e3a8a; text-transform: uppercase; letter-spacing: 0.05em;">Integrated Medical Network</span>
+        <h2 style="font-size: 1.1rem; font-weight: 700; color: #0f172a; margin-top: 0.25rem;">Comprehensive Emergency Care</h2>
+        <p style="color: #64748b; font-size: 0.845rem; margin-top: 0.25rem; line-height: 1.5;">
+          Coordinated emergency transport engineered for low response latency and seamless hospital triage.
+        </p>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem;">
+        <!-- Card 1 -->
+        <div class="feature-card">
+          <div>
+            <div class="icon-badge" style="background: #eff6ff; color: #1e3a8a;">
+              <svg style="width: 20px; height: 20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+              </svg>
+            </div>
+            <h3 style="font-size: 0.95rem; font-weight: 700; color: #0f172a; margin-bottom: 0.35rem;">Smart Fleet Allocation</h3>
+            <p style="color: #64748b; font-size: 0.8125rem; line-height: 1.5; margin-bottom: 1rem;">
+              Haversine GPS algorithm instantly calculates the nearest ambulance unit, minimizing critical transit time.
+            </p>
+          </div>
+          <a href="booking.html" style="font-size: 0.8125rem; font-weight: 600; color: #1e3a8a; text-decoration: none; display: inline-flex; align-items: center; gap: 0.35rem;">
+            Book Nearest Unit &rarr;
+          </a>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="feature-card">
+          <div>
+            <div class="icon-badge" style="background: #f0fdf4; color: #15803d;">
+              <svg style="width: 20px; height: 20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+              </svg>
+            </div>
+            <h3 style="font-size: 0.95rem; font-weight: 700; color: #0f172a; margin-bottom: 0.35rem;">Live Telemetry & Tracking</h3>
+            <p style="color: #64748b; font-size: 0.8125rem; line-height: 1.5; margin-bottom: 1rem;">
+              Real-time GPS coordinates, vehicle velocity, and accurate turn-by-turn ETA telemetry to your door.
+            </p>
+          </div>
+          <a href="tracking.html" style="font-size: 0.8125rem; font-weight: 600; color: #1e3a8a; text-decoration: none; display: inline-flex; align-items: center; gap: 0.35rem;">
+            Open Live Telemetry &rarr;
+          </a>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="feature-card">
+          <div>
+            <div class="icon-badge" style="background: #fef2f2; color: #dc2626;">
+              <svg style="width: 20px; height: 20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+              </svg>
+            </div>
+            <h3 style="font-size: 0.95rem; font-weight: 700; color: #0f172a; margin-bottom: 0.35rem;">Hospital Trauma Triaging</h3>
+            <p style="color: #64748b; font-size: 0.8125rem; line-height: 1.5; margin-bottom: 1rem;">
+              Integrated coordination with regional ICU trauma centers ensures bed readiness upon patient arrival.
+            </p>
+          </div>
+          <a href="#hospitals-section" style="font-size: 0.8125rem; font-weight: 600; color: #1e3a8a; text-decoration: none; display: inline-flex; align-items: center; gap: 0.35rem;">
+            View Hospital Network &rarr;
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works Section -->
+  <section style="padding: 2.25rem 0; background: #f8fafc; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
+    <div class="container">
+      <div style="text-align: center; max-width: 680px; margin: 0 auto 1.75rem auto;">
+        <span style="font-size: 0.775rem; font-weight: 700; color: #1e3a8a; text-transform: uppercase; letter-spacing: 0.05em;">Intelligent Workflow</span>
+        <h2 style="font-size: 1.1rem; font-weight: 700; color: #0f172a; margin-top: 0.25rem;">How RESQCARE Works</h2>
+        <p style="color: #64748b; font-size: 0.845rem; margin-top: 0.25rem;">Engineered for high reliability, minimal latency, and life safety in critical conditions.</p>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem;">
+        <div class="card" style="text-align: center; padding: 1.25rem 1rem;">
+          <div class="step-circle" style="background: #eff6ff; color: #1e3a8a;">1</div>
+          <h3 style="font-size: 0.925rem; font-weight: 700; color: #0f172a; margin-bottom: 0.35rem;">Request Ambulance</h3>
+          <p style="color: #64748b; font-size: 0.8125rem; line-height: 1.5;">Submit pickup location with 1-click GPS or type your landmark, patient phone, and emergency severity.</p>
+        </div>
+
+        <div class="card" style="text-align: center; padding: 1.25rem 1rem;">
+          <div class="step-circle" style="background: #ecfdf5; color: #059669;">2</div>
+          <h3 style="font-size: 0.925rem; font-weight: 700; color: #0f172a; margin-bottom: 0.35rem;">Nearest Allocation</h3>
+          <p style="color: #64748b; font-size: 0.8125rem; line-height: 1.5;">Automated dispatch algorithm scans active units and allocates the nearest suitable ambulance.</p>
+        </div>
+
+        <div class="card" style="text-align: center; padding: 1.25rem 1rem;">
+          <div class="step-circle" style="background: #fffbeb; color: #d97706;">3</div>
+          <h3 style="font-size: 0.925rem; font-weight: 700; color: #0f172a; margin-bottom: 0.35rem;">Live Telemetry</h3>
+          <p style="color: #64748b; font-size: 0.8125rem; line-height: 1.5;">Track ambulance speed, estimated minutes of arrival, driver contact details, and route progress live.</p>
+        </div>
+
+        <div class="card" style="text-align: center; padding: 1.25rem 1rem;">
+          <div class="step-circle" style="background: #fef2f2; color: #dc2626;">4</div>
+          <h3 style="font-size: 0.925rem; font-weight: 700; color: #0f172a; margin-bottom: 0.35rem;">Hospital Handover</h3>
+          <p style="color: #64748b; font-size: 0.8125rem; line-height: 1.5;">Emergency crew stabilizes patient, routes directly to selected trauma hospital, and records admission.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Emergency Contact Banner -->
+  <section style="background: #dc2626; color: white; padding: 1.5rem 0;">
+    <div class="container" style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem;">
+      <div>
+        <h2 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 0.25rem; color: #ffffff;">Immediate Critical Emergency?</h2>
+        <p style="color: #fecaca; font-size: 0.845rem; margin: 0;">Central Emergency Medical Helpline is active 24 hours a day, 7 days a week.</p>
+      </div>
+      <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+        <a href="tel:108" class="btn" style="background: #ffffff; color: #dc2626; font-size: 0.875rem; font-weight: 700; padding: 0.55rem 1.1rem;">
+          <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
+          </svg>
+          Call 108
+        </a>
+        <a href="booking.html" class="btn" style="background: #0f172a; color: #ffffff; font-weight: 600; padding: 0.55rem 1rem; font-size: 0.85rem;">
+          Quick Online Dispatch
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Universal Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 2.5rem; margin-bottom: 2rem;">
+        <div>
+          <div class="brand" style="color: white; margin-bottom: 1rem;">
+            <div class="brand-text">RESQ<span>CARE</span></div>
+          </div>
+          <p style="font-size: 0.875rem; color: #94a3b8; line-height: 1.6;">
+            Enterprise Emergency Vehicle Dispatch, Real-Time Telemetry Tracking, and Regional Trauma Center Integration Platform.
+          </p>
+        </div>
+        <div>
+          <h4 style="color: white; margin-bottom: 1rem; font-size: 0.95rem;">Quick Navigation</h4>
+          <ul style="list-style: none; display: flex; flex-direction: column; gap: 0.6rem; font-size: 0.875rem;">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="booking.html">Book Ambulance</a></li>
+            <li><a href="tracking.html">Track Location</a></li>
+            <li><a href="#hospitals-section">Hospitals</a></li>
+            <li><a href="history.html">Booking History</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 style="color: white; margin-bottom: 1rem; font-size: 0.95rem;">Emergency Helplines</h4>
+          <p style="font-size: 0.875rem; color: #94a3b8; line-height: 1.8;">
+            Central Dispatch: <strong style="color: #ffffff;">108</strong><br>
+            Triage Desk: +1-800-555-0144<br>
+            Direct Support: support@resqcare.org
+          </p>
+        </div>
+      </div>
+      <div style="text-align: center; border-top: 1px solid #1e293b; padding-top: 1.5rem; font-size: 0.8rem; color: #64748b;">
+        &copy; 2026 RESQCARE. All rights reserved.
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/location.js"></script>
+  <script src="js/notifications.js"></script>
+  <script src="js/ui.js"></script>
+  <script>
+    /**
+     * Home Page Hospitals Controller
+     * Strictly restricted to 10 km radius from pickup location
+     */
+    const HomeHospitals = {
+      list: [],
+      userLat: CONFIG.DEFAULT_LATITUDE,
+      userLon: CONFIG.DEFAULT_LONGITUDE,
+      pickupLabel: '100 Medical Square, Central District',
+      radiusKm: 10.0,
+      debounceTimer: null,
+
+      escapeHtml(str) {
+        if (!str) return '';
+        return String(str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+      },
+
+      updateBanner() {
+        const bannerText = document.getElementById('home-radius-banner-text');
+        const pickupLabelEl = document.getElementById('home-pickup-label');
+        const coordsEl = document.getElementById('home-pickup-coords');
+
+        if (bannerText) {
+          bannerText.textContent = `Showing hospitals within ${this.radiusKm} km of your pickup location.`;
+        }
+        if (pickupLabelEl) pickupLabelEl.textContent = this.pickupLabel;
+        if (coordsEl) coordsEl.textContent = `${this.userLat.toFixed(4)}, ${this.userLon.toFixed(4)}`;
+      },
+
+      handlePickupInput(val) {
+        clearTimeout(this.debounceTimer);
+        const trimmed = (val || '').trim();
+        if (!trimmed) return;
+
+        this.debounceTimer = setTimeout(async () => {
+          try {
+            const geo = typeof LocationService !== 'undefined'
+              ? await LocationService.geocode(trimmed)
+              : null;
+            if (geo && geo.lat != null && geo.lon != null) {
+              this.userLat = geo.lat;
+              this.userLon = geo.lon;
+              this.pickupLabel = geo.label || trimmed;
+              this.updateBanner();
+              await this.load();
+            }
+          } catch (e) {
+            console.warn('Geocoding error:', e);
+          }
+        }, 450);
+      },
+
+      changeRadius(val) {
+        this.radiusKm = parseFloat(val) || 10.0;
+        this.updateBanner();
+        this.load();
+      },
+
+      async load() {
+        this.updateBanner();
+        const grid = document.getElementById('home-hospitals-grid');
+        const countEl = document.getElementById('home-facilities-count-text');
+        if (!grid) return;
+
+        grid.innerHTML = `
+          <div style="grid-column: 1 / -1; text-align: center; padding: 3rem 1.5rem; background: #ffffff; border: 1px solid var(--border); border-radius: var(--radius-md);">
+            <div class="spinner" style="margin: 0 auto 1rem auto;"></div>
+            <h4 style="font-size: 1.1rem; font-weight: 700; color: #0f172a; margin-bottom: 0.35rem;">Querying Hospitals Within ${this.radiusKm} km...</h4>
+            <p style="color: #64748b; font-size: 0.85rem; margin: 0;">Calculating Haversine straight-line distance from [${this.userLat.toFixed(4)}, ${this.userLon.toFixed(4)}].</p>
+          </div>
+        `;
+
+        try {
+          const data = await api.get('/hospitals/nearby', {
+            lat: this.userLat,
+            lon: this.userLon,
+            radiusKm: this.radiusKm
+          });
+          const raw = Array.isArray(data) ? data : [];
+          // Strict filter: distance <= this.radiusKm
+          this.list = raw.filter(h => h.distanceKm !== null && h.distanceKm !== undefined && h.distanceKm <= this.radiusKm);
+          this.list.sort((a, b) => (a.distanceKm || 0) - (b.distanceKm || 0));
+          this.render();
+        } catch (err) {
+          console.error('Failed to load hospitals from backend:', err);
+          const isNetworkErr = !err.message || err.message.includes('fetch') || err.message.includes('Network');
+          if (countEl) countEl.textContent = 'Service unavailable';
+          grid.innerHTML = `
+            <div class="card" style="grid-column: 1 / -1; text-align: center; padding: 2.5rem 1.5rem; border: 1px solid #fecaca; background: #fffaf0;">
+              <div style="width: 48px; height: 48px; border-radius: 50%; background: #fee2e2; color: #dc2626; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; font-weight: 800; margin: 0 auto 1rem auto;">!</div>
+              <h3 style="font-size: 1.15rem; font-weight: 800; color: #991b1b; margin-bottom: 0.35rem;">Medical Network Directory Temporarily Unavailable</h3>
+              <p style="color: #64748b; font-size: 0.85rem; max-width: 520px; margin: 0 auto 1.25rem auto; line-height: 1.5;">
+                ${isNetworkErr ? 'Unable to reach backend service at <code>' + this.escapeHtml(CONFIG.API_BASE_URL) + '</code>. Please verify that the application server is active.' : 'Error: ' + this.escapeHtml(err.message)}
+              </p>
+              <div style="display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap;">
+                <button onclick="HomeHospitals.load()" class="btn btn-primary btn-sm">Retry Connection</button>
+                <a href="booking.html" class="btn btn-danger btn-sm">Direct Ambulance Dispatch</a>
+              </div>
+            </div>
+          `;
+        }
+      },
+
+      render() {
+        const searchInput = document.getElementById('home-search-hospital');
+        const icuSelect = document.getElementById('home-filter-icu');
+        const grid = document.getElementById('home-hospitals-grid');
+        const countEl = document.getElementById('home-facilities-count-text');
+
+        const search = (searchInput?.value || '').toLowerCase().trim();
+        const icuOnly = icuSelect?.value;
+
+        // If no hospitals within 10 km, display exact prompt requirement:
+        // "No hospitals found within 10 km of your pickup location. You can change your pickup location or expand your search radius."
+        if (!this.list || this.list.length === 0) {
+          if (countEl) countEl.textContent = `0 hospitals found within ${this.radiusKm} km`;
+          grid.innerHTML = `
+            <div class="card" style="grid-column: 1 / -1; text-align: center; padding: 2.75rem 1.5rem; border: 1px solid #fed7aa; background: #fffaf0;">
+              <h3 style="font-size: 1.15rem; font-weight: 800; color: #9a3412; margin-bottom: 0.5rem;">
+                No hospitals found within 10 km of your pickup location.
+              </h3>
+              <p style="color: #64748b; font-size: 0.85rem; max-width: 520px; margin: 0 auto 1.25rem auto; line-height: 1.5;">
+                No hospitals found within 10 km of your pickup location. You can change your pickup location or expand your search radius.
+              </p>
+              <div style="display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap;">
+                <button onclick="HomeHospitals.changeRadius(20.0)" class="btn btn-primary btn-sm" style="font-weight: 600;">
+                  Expand to 20 km
+                </button>
+                <button onclick="document.getElementById('home-pickup-input').focus()" class="btn btn-outline btn-sm">
+                  Change Pickup Location
+                </button>
+              </div>
+            </div>
+          `;
+          return;
+        }
+
+        const filtered = this.list.filter(h => {
+          if (icuOnly === 'true' && !h.icuAvailable) return false;
+          if (search) {
+            const nameMatch = (h.name || '').toLowerCase().includes(search);
+            const addrMatch = (h.address || '').toLowerCase().includes(search);
+            if (!nameMatch && !addrMatch) return false;
+          }
+          return true;
+        });
+
+        if (countEl) {
+          countEl.textContent = `Showing ${filtered.length} of ${this.list.length} hospital(s) within ${this.radiusKm} km`;
+        }
+
+        if (filtered.length === 0) {
+          grid.innerHTML = `
+            <div class="card" style="grid-column: 1 / -1; text-align: center; padding: 2.5rem 1.5rem;">
+              <h3 style="font-size: 1.05rem; font-weight: 700; color: #0f172a; margin-bottom: 0.35rem;">No Matching Medical Centers Found</h3>
+              <p style="color: #64748b; font-size: 0.845rem; margin-bottom: 1rem;">Try adjusting your search query or removing the ICU bed filter.</p>
+              <button onclick="HomeHospitals.resetFilters()" class="btn btn-outline btn-sm">Clear Filters</button>
+            </div>
+          `;
+          return;
+        }
+
+        grid.innerHTML = filtered.map(h => {
+          const distKm = h.distanceKm != null ? h.distanceKm.toFixed(2) : 'N/A';
+          const mapUrl = `https://www.google.com/maps?q=${h.latitude || 12.97244},${h.longitude || 77.58064}`;
+          const directionsUrl = `https://www.google.com/maps/dir/?api=1&origin=${this.userLat},${this.userLon}&destination=${h.latitude},${h.longitude}`;
+
+          return `
+            <article class="hospital-card">
+              <div>
+                <div class="hospital-card-header">
+                  <h3 class="hospital-title">${this.escapeHtml(h.name)}</h3>
+                  <span class="badge badge-normal" style="flex-shrink: 0; font-size: 0.725rem; font-weight: 700; background: #e0f2fe; color: #0369a1;">
+                    ${distKm} km
+                  </span>
+                </div>
+
+                <!-- Address & Location -->
+                <div class="hospital-address-row">
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                  </svg>
+                  <span>${this.escapeHtml(h.address || 'Address registered in medical database')}</span>
+                </div>
+
+                <!-- Distance Label -->
+                <div style="font-size: 0.75rem; color: #0369a1; margin-bottom: 0.5rem; font-weight: 600;">
+                  &#9679; Straight-line distance: <strong>${distKm} km</strong>
+                </div>
+
+                <!-- Contact Number -->
+                <div style="display: flex; align-items: center; gap: 0.35rem; color: #1e3a8a; font-size: 0.8125rem; font-weight: 700; margin-bottom: 0.65rem;">
+                  <svg style="width: 14px; height: 14px; flex-shrink: 0;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
+                  </svg>
+                  ${h.phone ? `<a href="tel:${this.escapeHtml(h.phone)}" style="color: #1e3a8a; text-decoration: none;" title="Call Emergency Contact">${this.escapeHtml(h.phone)}</a>` : '<span style="color: #64748b; font-weight: normal;">Contact on triage</span>'}
+                </div>
+
+                <!-- Available Emergency Services -->
+                <div style="display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 0.75rem;">
+                  ${h.emergencyAvailable ? '<span class="badge badge-available" style="font-size: 0.7rem;">24/7 Trauma Emergency</span>' : '<span class="badge badge-maintenance" style="font-size: 0.7rem;">Limited Emergency</span>'}
+                  ${h.icuAvailable ? '<span class="badge badge-assigned" style="font-size: 0.7rem;">ICU Beds Available</span>' : '<span class="badge badge-offline" style="font-size: 0.7rem;">No ICU Bed</span>'}
+                </div>
+
+                <!-- Description -->
+                <p class="hospital-desc">
+                  ${this.escapeHtml(h.description || 'Verified multi-specialty trauma, acute surgical response, and critical emergency triage center.')}
+                </p>
+              </div>
+
+              <!-- Card Actions -->
+              <div class="hospital-card-footer">
+                <div style="display: flex; gap: 0.35rem; align-items: center;">
+                  <a 
+                    href="${mapUrl}" 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    class="btn btn-outline btn-sm" 
+                    style="font-size: 0.75rem; font-weight: 600; padding: 0.35rem 0.6rem;"
+                    title="View hospital coordinates on Google Maps"
+                  >
+                    View on Map
+                  </a>
+
+                  <a 
+                    href="${directionsUrl}" 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    class="btn btn-outline btn-sm" 
+                    style="font-size: 0.75rem; font-weight: 600; padding: 0.35rem 0.6rem; color: #1e3a8a; border-color: #93c5fd;"
+                    title="Get directions from pickup location to hospital"
+                  >
+                    Directions
+                  </a>
+                </div>
+
+                <a 
+                  href="booking.html?hospitalId=${h.id}&hospital=${encodeURIComponent(h.name)}" 
+                  class="btn btn-primary btn-sm" 
+                  style="font-size: 0.75rem; font-weight: 700; padding: 0.35rem 0.75rem;"
+                  title="Book an ambulance with this hospital preselected"
+                >
+                  Route Ambulance &rarr;
+                </a>
+              </div>
+            </article>
+          `;
+        }).join('');
+      },
+
+      resetFilters() {
+        const searchInput = document.getElementById('home-search-hospital');
+        const icuSelect = document.getElementById('home-filter-icu');
+        if (searchInput) searchInput.value = '';
+        if (icuSelect) icuSelect.value = '';
+        this.render();
+      },
+
+      async useLocationFilter() {
+        const btn = document.getElementById('home-use-gps-btn') || document.getElementById('home-sort-distance-btn');
+        if (btn) UI.setButtonLoading(btn, true, 'Detecting GPS...');
+
+        if (typeof LocationService !== 'undefined') {
+          try {
+            const pos = await LocationService.getCurrentGpsPosition();
+            if (btn) UI.setButtonLoading(btn, false);
+            this.userLat = pos.lat;
+            this.userLon = pos.lon;
+            this.pickupLabel = pos.label || `GPS Pin: ${pos.lat.toFixed(4)}, ${pos.lon.toFixed(4)}`;
+            const input = document.getElementById('home-pickup-input');
+            if (input) input.value = this.pickupLabel;
+            this.updateBanner();
+            UI.showToast('GPS coordinates acquired. Updating nearby hospitals...', 'success');
+            await this.load();
+          } catch (err) {
+            if (btn) UI.setButtonLoading(btn, false);
+            UI.showToast(err.message || 'GPS unavailable. Please enter pickup address.', 'warning');
+          }
+        } else {
+          if (btn) UI.setButtonLoading(btn, false);
+          this.load();
+        }
+      }
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+      if (!Auth.requireAuth()) return;
+      UI.renderNavbar('home');
+
+      // Initialize Home page hospitals
+      HomeHospitals.load();
+
+      const searchInput = document.getElementById('home-search-hospital');
+      const icuSelect = document.getElementById('home-filter-icu');
+      if (searchInput) searchInput.addEventListener('input', () => HomeHospitals.render());
+      if (icuSelect) icuSelect.addEventListener('change', () => HomeHospitals.render());
+    });
+  </script>
+</body>
+</html>

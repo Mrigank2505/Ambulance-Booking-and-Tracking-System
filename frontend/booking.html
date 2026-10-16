@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Book Ambulance - RESQCARE</title>
+  <meta name="description" content="Emergency ambulance booking with smart nearest unit dispatch, 10-second auto-booking countdown, and regional trauma connectivity.">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="js/auth.js"></script>
+  <script>
+    if (!Auth.isAuthenticated()) {
+      window.location.replace('login.html?redirect=booking.html');
+    }
+  </script>
+</head>
+<body>
+
+  <!-- Fixed Navigation Bar -->
+  <div id="navbar-container"></div>
+
+  <div class="container" style="max-width: 820px; margin: 1.5rem auto 2.5rem auto;">
+    <div class="card" style="padding: 1.25rem; border-top: 4px solid #dc2626;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+        <div>
+          <div style="display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.2rem;">
+            <h1 style="font-size: 1.5rem; font-weight: 800; color: #0f172a; margin: 0;">Request Emergency Ambulance</h1>
+          </div>
+          <p style="color: #64748b; font-size: 0.845rem; margin: 0;">Immediate emergency dispatch with automated Critical Care fail-safe</p>
+        </div>
+        <span class="badge badge-critical" style="font-size: 0.7rem;">HIGH PRIORITY</span>
+      </div>
+
+      <!-- Live Fleet Standby Status Indicator -->
+      <div id="fleet-preview" style="margin-bottom: 1.25rem;">
+        <div style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 0.75rem 1rem; border-radius: 8px; color: #64748b; font-size: 0.875rem;">
+          Triangulating standby emergency response units in your area...
+        </div>
+      </div>
+
+      <!-- Emergency 10-Second Auto-Booking Timer Container -->
+      <div id="auto-booking-container" style="margin-bottom: 1.5rem; background: #fff5f5; border: 1px solid #fecaca; border-left: 5px solid #dc2626; border-radius: 8px; padding: 1.25rem; box-shadow: 0 2px 8px rgba(220, 38, 38, 0.08); transition: all 0.3s ease;">
+        
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; flex-wrap: wrap;">
+          <div style="flex: 1; min-width: 260px;">
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
+              <span id="countdown-status-dot" style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #dc2626; box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.25);"></span>
+              <strong id="auto-booking-title" style="color: #991b1b; font-size: 0.95rem;">10-Second Emergency Dispatch Timer</strong>
+              <span id="auto-booking-badge" class="badge badge-critical" style="font-size: 0.65rem;">DEFAULT: CRITICAL AMBULANCE</span>
+            </div>
+            
+            <p id="auto-booking-message" style="color: #7f1d1d; font-size: 0.9rem; font-weight: 600; margin: 0 0 0.25rem 0; line-height: 1.45;">
+              Please enter your booking details within 10 seconds.
+            </p>
+            <p id="auto-booking-subtext" style="color: #991b1b; font-size: 0.8rem; margin: 0; line-height: 1.4;">
+              Critical Ambulance is preselected. Starting to type in any field will automatically stop the countdown.
+            </p>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 0.75rem;">
+            <!-- Prominent Countdown Digits -->
+            <div id="timer-box" style="display: flex; flex-direction: column; align-items: center; justify-content: center; background: #ffffff; border: 2px solid #dc2626; border-radius: 8px; padding: 0.4rem 0.9rem; min-width: 72px; box-shadow: 0 3px 8px rgba(220, 38, 38, 0.15); transition: all 0.2s ease;">
+              <span id="countdown-timer-display" style="font-size: 1.45rem; font-weight: 800; color: #dc2626; font-variant-numeric: tabular-nums; line-height: 1;">10s</span>
+              <span id="timer-label" style="font-size: 0.625rem; color: #991b1b; font-weight: 700; text-transform: uppercase; margin-top: 2px;">COUNTDOWN</span>
+            </div>
+
+            <!-- Manual Pause / Cancel Option -->
+            <button type="button" id="btn-cancel-countdown" onclick="BookingEngine.stopCountdownOnUserInteraction('manual_button')" class="btn btn-sm btn-outline" style="background: #ffffff; color: #991b1b; border-color: #fca5a5; font-size: 0.8rem; font-weight: 600;">
+              Pause Timer
+            </button>
+          </div>
+        </div>
+
+        <!-- Visual Animated Progress Indicator Bar -->
+        <div style="margin-top: 0.85rem; background: #fee2e2; border-radius: 4px; height: 6px; overflow: hidden; position: relative;">
+          <div id="countdown-progress-bar" style="height: 100%; width: 100%; background: linear-gradient(90deg, #dc2626, #ef4444); border-radius: 4px; transition: width 0.95s linear;"></div>
+        </div>
+
+        <!-- Missing Information Prompt Area (Revealed if timer expires without complete details) -->
+        <div id="missing-info-prompt" style="display: none; margin-top: 1rem; padding-top: 0.85rem; border-top: 1px dashed #fca5a5;">
+          <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+            <strong style="color: #991b1b; font-size: 0.875rem;">Information Required for Critical Ambulance Dispatch:</strong>
+          </div>
+          <p id="missing-info-text" style="color: #7f1d1d; font-size: 0.825rem; margin-bottom: 0.75rem; line-height: 1.4;">
+            Please enter the required pickup location and patient details below to proceed.
+          </p>
+          <div style="display: flex; gap: 0.65rem; flex-wrap: wrap;">
+            <button type="button" id="btn-quick-critical" onclick="BookingEngine.quickBookCritical()" class="btn btn-danger btn-sm" style="font-weight: 700; font-size: 0.825rem;">
+              Continue with Critical Ambulance
+            </button>
+            <button type="button" onclick="BookingEngine.useCurrentLocation()" class="btn btn-outline btn-sm" style="background: #ffffff; color: #1e3a8a; border-color: #93c5fd; font-size: 0.825rem; font-weight: 600;">
+              Use Current GPS Location
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Booking Failure / Error Banner with Retry Button -->
+      <div id="booking-error-container" style="display: none; background: #fff1f2; border: 1px solid #fecdd3; border-radius: 8px; padding: 1.25rem; margin-bottom: 1.5rem;" role="alert">
+        <div style="display: flex; align-items: flex-start; gap: 0.75rem;">
+          <div style="color: #e11d48; font-weight: 800; font-size: 1.25rem; line-height: 1;">!</div>
+          <div style="flex: 1;">
+            <strong id="booking-error-title" style="color: #9f1239; font-size: 0.95rem; display: block; margin-bottom: 0.25rem;">Dispatch Request Failed</strong>
+            <p id="booking-error-msg" style="color: #be123c; font-size: 0.875rem; margin-bottom: 0.85rem; line-height: 1.5;"></p>
+            <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+              <button type="button" id="btn-retry-booking" onclick="BookingEngine.retryBooking()" class="btn btn-danger btn-sm" style="font-weight: 700;">
+                Retry Booking
+              </button>
+              <a href="tel:108" class="btn btn-outline btn-sm" style="color: #9f1239; border-color: #fca5a5; font-weight: 600;">
+                Emergency Helpline: 108
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Loading indicator for profile retrieval -->
+      <div id="profile-loading-indicator" style="display: flex; align-items: center; gap: 0.6rem; padding: 0.65rem 1rem; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 6px; font-size: 0.825rem; color: #166534; margin-bottom: 1.25rem;">
+        <span class="spinner" style="width: 14px; height: 14px; border-width: 2px;"></span>
+        <span>Retrieving registered user profile from database...</span>
+      </div>
+
+      <!-- Verified Registered Profile Banner -->
+      <div id="profile-status-badge" style="display: none; padding: 0.75rem 1rem; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 6px; font-size: 0.825rem; color: #1e40af; margin-bottom: 1.25rem;">
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
+          <div>
+            <strong style="color: #1e3a8a;">Registered User Profile Loaded:</strong>
+            <span id="profile-user-info" style="font-weight: 600; color: #2563eb;">Loading...</span>
+          </div>
+          <span class="badge badge-normal" style="font-size: 0.675rem; text-transform: uppercase;">VERIFIED ACCOUNT</span>
+        </div>
+        <p style="margin: 0.25rem 0 0 0; font-size: 0.775rem; color: #3b82f6;">
+          Your saved registered details have been automatically filled into the form. You can update any fields or modify the pickup location below.
+        </p>
+      </div>
+
+      <!-- Missing Profile Information Alert -->
+      <div id="profile-missing-alert" style="display: none; padding: 0.75rem 1rem; background: #fffbeb; border: 1px solid #fde68a; border-radius: 6px; font-size: 0.825rem; color: #92400e; margin-bottom: 1.25rem;" role="alert">
+        <strong id="profile-missing-title">Incomplete Profile Details:</strong>
+        <span id="profile-missing-msg">Please enter your contact number or current pickup location below.</span>
+      </div>
+
+      <form id="booking-form" novalidate>
+        <!-- Patient Info with Registered Email -->
+        <div class="form-row">
+          <div class="form-group" style="flex: 1.2;">
+            <label class="form-label" for="patientName">Patient / User Full Name *</label>
+            <input type="text" id="patientName" class="form-control" placeholder="Patient's full name" required autofocus>
+          </div>
+          <div class="form-group" style="flex: 1;">
+            <label class="form-label" for="patientEmail">Registered Email</label>
+            <input type="email" id="patientEmail" class="form-control" placeholder="Registered email" readonly style="background: #f8fafc; color: #475569; cursor: not-allowed;">
+          </div>
+          <div class="form-group" style="flex: 1;">
+            <label class="form-label" for="patientPhone">Contact Phone Number *</label>
+            <input type="tel" id="patientPhone" class="form-control" placeholder="+1-800-555-0301" required>
+          </div>
+        </div>
+
+        <!-- Pickup Location & GPS -->
+        <div class="form-group">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+            <label class="form-label" for="pickupAddress" style="margin-bottom: 0;">Pickup Location Address / Saved Landmark *</label>
+            <button type="button" id="btn-use-location" onclick="BookingEngine.useCurrentLocation()" class="btn btn-outline btn-sm" style="color: #1e3a8a; border-color: #3b82f6; font-size: 0.8rem; font-weight: 600;">
+              Use Current Location
+            </button>
+          </div>
+          <input type="text" id="pickupAddress" class="form-control" placeholder="Building, Street, Landmark or Metro Area" required>
+          <small id="pickup-help" style="color: #64748b; font-size: 0.775rem; margin-top: 0.25rem; display: block;">
+            Pre-filled with your saved profile address. You may modify this if the emergency is at a different location.
+          </small>
+          
+          <div style="margin-top: 0.4rem; display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; color: #64748b;">
+            <span>GPS Pin Coordinates:</span>
+            <span id="coords-badge" style="font-family: monospace; background: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-weight: 600;">12.9716, 77.5946</span>
+            <input type="hidden" id="pickupLat" value="12.9716">
+            <input type="hidden" id="pickupLon" value="77.5946">
+          </div>
+        </div>
+
+        <!-- Ambulance Selection Section (3 Specified Options) -->
+        <div class="form-group" style="margin-bottom: 1.5rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+            <label class="form-label" style="margin-bottom: 0;">Ambulance Selection Specification *</label>
+            <span id="selected-type-badge" class="badge badge-critical" style="font-size: 0.75rem;">DEFAULT: CRITICAL CARE / ICU</span>
+          </div>
+
+          <div class="ambulance-selection-grid" id="amb-cards-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.85rem; margin-top: 0.5rem;">
+            <!-- Option 1: Basic Ambulance -->
+            <div class="ambulance-card" id="card-amb-BASIC" onclick="BookingEngine.selectAmbulanceType('BASIC')" style="background: #ffffff; border: 2px solid #e2e8f0; border-radius: 8px; padding: 1.15rem; cursor: pointer; transition: all 0.2s ease; display: flex; flex-direction: column; justify-content: space-between;">
+              <div>
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.4rem;">
+                  <strong style="color: #0f172a; font-size: 0.95rem;">Basic Ambulance</strong>
+                  <span class="badge badge-normal">BLS</span>
+                </div>
+                <p style="font-size: 0.825rem; color: #64748b; margin-bottom: 0.75rem; line-height: 1.45;">
+                  First aid supplies, patient stretcher, portable oxygen, and basic vitals support.
+                </p>
+              </div>
+              <div style="font-size: 0.75rem; color: #059669; font-weight: 700;">Non-Critical / Transfer</div>
+            </div>
+
+            <!-- Option 2: Advanced Life Support (ALS) -->
+            <div class="ambulance-card" id="card-amb-ALS" onclick="BookingEngine.selectAmbulanceType('ALS')" style="background: #ffffff; border: 2px solid #e2e8f0; border-radius: 8px; padding: 1.15rem; cursor: pointer; transition: all 0.2s ease; display: flex; flex-direction: column; justify-content: space-between;">
+              <div>
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.4rem;">
+                  <strong style="color: #0f172a; font-size: 0.95rem;">Advanced Life Support (ALS)</strong>
+                  <span class="badge badge-serious">ALS</span>
+                </div>
+                <p style="font-size: 0.825rem; color: #64748b; margin-bottom: 0.75rem; line-height: 1.45;">
+                  Cardiac defibrillator, ECG telemetry, IV medication kit, oxygen & paramedic crew.
+                </p>
+              </div>
+              <div style="font-size: 0.75rem; color: #d97706; font-weight: 700;">Cardiac / Serious Trauma</div>
+            </div>
+
+            <!-- Option 3: Critical Care / ICU Ambulance -->
+            <div class="ambulance-card selected-critical" id="card-amb-ICU" onclick="BookingEngine.selectAmbulanceType('ICU')" style="background: #fff5f5; border: 2px solid #dc2626; border-radius: 8px; padding: 1.15rem; cursor: pointer; transition: all 0.2s ease; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.25);">
+              <div>
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.4rem;">
+                  <strong style="color: #991b1b; font-size: 0.95rem;">Critical Care / ICU Ambulance</strong>
+                  <span class="badge badge-critical">PRIORITY ICU</span>
+                </div>
+                <p style="font-size: 0.825rem; color: #64748b; margin-bottom: 0.75rem; line-height: 1.45;">
+                  Mobile ICU ventilator, multipara monitor, emergency physician & resuscitation life support.
+                </p>
+              </div>
+              <div style="font-size: 0.75rem; color: #dc2626; font-weight: 800;">Emergency Priority Auto-Target</div>
+            </div>
+          </div>
+
+          <!-- Hidden input bound to form submission -->
+          <input type="hidden" id="ambulanceType" name="ambulanceType" value="ICU">
+        </div>
+
+        <!-- Destination Hospital with 10 KM Radius Restriction -->
+        <div class="form-group" style="margin-bottom: 0.75rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+            <label class="form-label" for="destinationHospital" style="margin-bottom: 0;">Destination Hospital / Trauma Center</label>
+            <span id="hospital-radius-badge" class="badge badge-assigned" style="font-size: 0.725rem;">10 KM RADIUS FILTER ACTIVE</span>
+          </div>
+          <select id="destinationHospital" class="form-control" onchange="BookingEngine.onHospitalSelectChange(this.value)">
+            <option value="">Nearest Emergency Hospital (&le; 10 km, Automatic)</option>
+          </select>
+          <small style="color: #64748b; font-size: 0.775rem;">Only verified emergency hospitals within 10 km of your pickup point are eligible for routing.</small>
+        </div>
+
+        <!-- Dynamic Hospitals Within 10 km Radius Panel -->
+        <div id="booking-nearby-hospitals-card" style="margin-bottom: 1.5rem; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 1rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.65rem; flex-wrap: wrap; gap: 0.5rem;">
+            <div style="display: flex; align-items: center; gap: 0.4rem;">
+              <span style="width: 8px; height: 8px; border-radius: 50%; background: #2563eb;"></span>
+              <strong id="booking-hospitals-banner" style="font-size: 0.85rem; color: #1e3a8a;">
+                Showing hospitals within 10 km of your pickup location.
+              </strong>
+            </div>
+            <span id="booking-hospital-count" style="font-size: 0.75rem; color: #059669; font-weight: 700;">Loading...</span>
+          </div>
+          <div id="booking-hospitals-list" style="display: flex; flex-direction: column; gap: 0.65rem; max-height: 290px; overflow-y: auto; padding-right: 4px;">
+            <!-- Populated dynamically by booking.js -->
+          </div>
+        </div>
+
+        <!-- Emergency Severity -->
+        <div class="form-group">
+          <label class="form-label" for="emergencyType">Emergency Severity *</label>
+          <select id="emergencyType" class="form-control">
+            <option value="CRITICAL" selected>Critical (Cardiac, Stroke, Severe Trauma)</option>
+            <option value="SERIOUS">Serious (Fracture, Intense Pain, Burn)</option>
+            <option value="NORMAL">Normal (Non-life threatening, Medical Transfer)</option>
+          </select>
+        </div>
+
+        <!-- Medical Notes -->
+        <div class="form-group">
+          <label class="form-label" for="notes">Additional Medical Notes / Symptoms</label>
+          <textarea id="notes" class="form-control" placeholder="E.g. Conscious status, breathing difficulty, age, floor/flat number..."></textarea>
+        </div>
+
+        <button type="submit" id="btn-submit-booking" class="btn btn-danger btn-pulse" style="width: 100%; margin-top: 1rem; font-weight: 700; padding: 0.6rem; font-size: 0.85rem;">
+          Confirm and Dispatch Ambulance
+        </button>
+      </form>
+
+      <!-- Emergency Safety Notice -->
+      <div style="margin-top: 1.25rem; padding: 0.75rem 1rem; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 0.75rem; color: #64748b; line-height: 1.5; text-align: center;">
+        <strong style="color: #475569;">Safety Notice:</strong> The 10-second automatic booking countdown is an emergency demonstration workflow. Dispatch confirmation and live driver tracking are verified through our backend once the booking is registered.
+      </div>
+    </div>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/location.js"></script>
+  <script src="js/notifications.js"></script>
+  <script src="js/validation.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/booking.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      if (!Auth.requireAuth()) return;
+      BookingEngine.initBookingPage();
+    });
+  </script>
+</body>
+</html>

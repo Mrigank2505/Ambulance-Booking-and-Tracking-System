@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Profile - RESQCARE</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="js/auth.js"></script>
+  <script>
+    if (!Auth.isAuthenticated()) {
+      window.location.replace('login.html?redirect=profile.html');
+    }
+  </script>
+</head>
+<body>
+
+  <!-- Dynamic Navbar -->
+  <div id="navbar-container"></div>
+
+  <div class="container" style="max-width: 860px; margin: 1.5rem auto 2.5rem auto;">
+    <div style="margin-bottom: 1.25rem;">
+      <h1 style="font-size: 1.5rem; font-weight: 800; color: #0f172a; margin-bottom: 0.2rem;">Account & Emergency Profile</h1>
+      <p style="color: #64748b; font-size: 0.845rem; margin: 0;">Manage personal contact information, passwords, and trusted emergency contacts</p>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 1.25rem; margin-bottom: 1.25rem;">
+      <!-- Profile Information -->
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Personal Details</h3>
+          <span id="profile-role-badge" class="badge badge-normal">USER</span>
+        </div>
+
+        <form id="profile-form">
+          <div class="form-group">
+            <label class="form-label" for="prof-name">Full Name</label>
+            <input type="text" id="prof-name" class="form-control" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="prof-email">Email (Login ID)</label>
+            <input type="email" id="prof-email" class="form-control" disabled style="background: #f1f5f9; cursor: not-allowed;">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="prof-phone">Contact Phone</label>
+            <input type="tel" id="prof-phone" class="form-control" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="prof-address">Primary Address / Landmark</label>
+            <input type="text" id="prof-address" class="form-control">
+          </div>
+
+          <button type="submit" id="btn-save-profile" class="btn btn-primary btn-sm" style="width: 100%;">
+            Update Profile Information
+          </button>
+        </form>
+      </div>
+
+      <!-- Security / Password -->
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Security & Password</h3>
+        </div>
+
+        <form id="password-form">
+          <div class="form-group">
+            <label class="form-label" for="curr-pass">Current Password</label>
+            <input type="password" id="curr-pass" class="form-control" placeholder="••••••••" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="new-pass">New Password</label>
+            <input type="password" id="new-pass" class="form-control" placeholder="Min 6 characters" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="conf-new-pass">Confirm New Password</label>
+            <input type="password" id="conf-new-pass" class="form-control" placeholder="Re-type new password" required>
+          </div>
+
+          <button type="submit" id="btn-change-pass" class="btn btn-outline btn-sm" style="width: 100%;">
+            Change Password
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Emergency Contacts Section -->
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <h3 class="card-title">Trusted Emergency Contacts</h3>
+          <p style="font-size: 0.8rem; color: #64748b; margin-top: 0.2rem;">These contacts receive automated SMS & Dispatch notices when you request an ambulance.</p>
+        </div>
+        <button onclick="document.getElementById('add-contact-modal').classList.add('open')" class="btn btn-danger btn-sm">
+          + Add Contact
+        </button>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Phone Number</th>
+              <th>Relationship</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="contacts-tbody">
+            <tr><td colspan="4" style="text-align: center; padding: 2rem; color: #64748b;">Loading emergency contacts...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Contact Modal -->
+  <div id="add-contact-modal" class="modal-backdrop" onclick="if(event.target === this) this.classList.remove('open')">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="card-title">Add Emergency Contact</h3>
+        <button class="close-btn" onclick="document.getElementById('add-contact-modal').classList.remove('open')">&times;</button>
+      </div>
+      <form id="contact-form">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label" for="cnt-name">Contact Full Name *</label>
+            <input type="text" id="cnt-name" class="form-control" placeholder="e.g. Jane Doe" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="cnt-phone">Phone Number *</label>
+            <input type="tel" id="cnt-phone" class="form-control" placeholder="+1-800-555-0399" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="cnt-rel">Relationship</label>
+            <select id="cnt-rel" class="form-control">
+              <option value="Spouse">Spouse</option>
+              <option value="Parent">Parent</option>
+              <option value="Child">Child</option>
+              <option value="Sibling">Sibling</option>
+              <option value="Doctor">Family Physician / Doctor</option>
+              <option value="Friend">Friend</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline btn-sm" onclick="document.getElementById('add-contact-modal').classList.remove('open')">Cancel</button>
+          <button type="submit" class="btn btn-primary btn-sm">Save Contact</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/validation.js"></script>
+  <script src="js/notifications.js"></script>
+  <script src="js/ui.js"></script>
+  <script>
+    async function initProfile() {
+      if (!Auth.requireAuth()) return;
+      try {
+        const u = await api.get('/users/me');
+        document.getElementById('prof-name').value = u.fullName || '';
+        document.getElementById('prof-email').value = u.email || '';
+        document.getElementById('prof-phone').value = u.phone || '';
+        document.getElementById('prof-address').value = u.address || '';
+        document.getElementById('profile-role-badge').textContent = u.role;
+
+        loadContacts();
+      } catch (err) {
+        UI.showToast(err.message, 'error');
+      }
+    }
+
+    async function loadContacts() {
+      const tbody = document.getElementById('contacts-tbody');
+      try {
+        const list = await api.get('/users/me/contacts');
+        if (!list || list.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: #64748b; padding: 2rem;">No emergency contacts added yet.</td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML = list.map(c => `
+          <tr>
+            <td><strong>${c.name}</strong></td>
+            <td><a href="tel:${c.phone}" style="color: #1e3a8a; text-decoration: none;">${c.phone}</a></td>
+            <td><span class="badge badge-normal">${c.relationship || 'Emergency'}</span></td>
+            <td>
+              <button onclick="deleteContact(${c.id})" class="btn btn-outline btn-sm" style="color: #dc2626;">Delete</button>
+            </td>
+          </tr>
+        `).join('');
+      } catch (e) {
+        tbody.innerHTML = `<tr><td colspan="4" class="alert alert-danger">${e.message}</td></tr>`;
+      }
+    }
+
+    async function deleteContact(id) {
+      UI.showConfirm('Delete Contact', 'Are you sure you want to remove this emergency contact?', async () => {
+        try {
+          await api.delete(`/users/me/contacts/${id}`);
+          UI.showToast('Emergency contact removed', 'success');
+          loadContacts();
+        } catch (e) {
+          UI.showToast(e.message, 'error');
+        }
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      if (!Auth.requireAuth()) return;
+      UI.renderNavbar('profile');
+      initProfile();
+
+      // Profile update form
+      document.getElementById('profile-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const fullName = document.getElementById('prof-name').value.trim();
+        const phone = document.getElementById('prof-phone').value.trim();
+        const address = document.getElementById('prof-address').value.trim();
+
+        try {
+          const updated = await api.put('/users/me', { fullName, phone, address });
+          Auth.setUser(updated);
+          UI.showToast('Profile updated successfully!', 'success');
+        } catch (err) {
+          UI.showToast(err.message, 'error');
+        }
+      });
+
+      // Password update form
+      document.getElementById('password-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const oldPassword = document.getElementById('curr-pass').value;
+        const newPassword = document.getElementById('new-pass').value;
+        const conf = document.getElementById('conf-new-pass').value;
+
+        if (newPassword !== conf) {
+          UI.showToast('New passwords do not match', 'error');
+          return;
+        }
+
+        try {
+          await api.put('/users/me/password', { oldPassword, newPassword });
+          UI.showToast('Password changed successfully!', 'success');
+          document.getElementById('password-form').reset();
+        } catch (err) {
+          UI.showToast(err.message, 'error');
+        }
+      });
+
+      // Contact create form
+      document.getElementById('contact-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const name = document.getElementById('cnt-name').value.trim();
+        const phone = document.getElementById('cnt-phone').value.trim();
+        const relationship = document.getElementById('cnt-rel').value;
+
+        try {
+          await api.post('/users/me/contacts', { name, phone, relationship });
+          UI.showToast('Emergency contact added', 'success');
+          document.getElementById('add-contact-modal').classList.remove('open');
+          document.getElementById('contact-form').reset();
+          loadContacts();
+        } catch (err) {
+          UI.showToast(err.message, 'error');
+        }
+      });
+    });
+  </script>
+</body>
+</html>

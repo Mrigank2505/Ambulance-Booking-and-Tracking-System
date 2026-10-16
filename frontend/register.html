@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RESQCARE - Register</title>
+  <meta name="description" content="Secure role-based account registration for Citizens, Emergency Ambulance Drivers, and System Administrators in RESQCARE.">
+
+  <!-- Typography & Styling -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/login.css">
+  <style>
+    .register-wrapper {
+      width: 100%;
+      max-width: 600px;
+      padding: 2rem 1.25rem;
+      box-sizing: border-box;
+    }
+    .register-card {
+      width: 100%;
+      background-color: var(--bg-white);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
+      padding: 2.25rem 2rem;
+      box-sizing: border-box;
+    }
+    /* Role Selection Grid */
+    .role-selection-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.65rem;
+      margin-bottom: 1.5rem;
+    }
+    .role-card-btn {
+      background: #f8fafc;
+      border: 2px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 0.75rem 0.5rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.25rem;
+    }
+    .role-card-btn:hover {
+      background: #f1f5f9;
+      border-color: #cbd5e1;
+    }
+    .role-card-btn.active {
+      background: #eff6ff;
+      border-color: #1e3a8a;
+      box-shadow: 0 0 0 1px #1e3a8a;
+    }
+    .role-card-btn.active.role-admin {
+      background: #fef2f2;
+      border-color: #dc2626;
+      box-shadow: 0 0 0 1px #dc2626;
+    }
+    .role-card-btn.active.role-driver {
+      background: #f0fdf4;
+      border-color: #059669;
+      box-shadow: 0 0 0 1px #059669;
+    }
+    .role-card-icon {
+      font-size: 1.25rem;
+      line-height: 1;
+    }
+    .role-card-title {
+      font-size: 0.825rem;
+      font-weight: 700;
+      color: #0f172a;
+      margin: 0;
+    }
+    .role-card-subtitle {
+      font-size: 0.675rem;
+      color: #64748b;
+      margin: 0;
+    }
+    .form-grid-two {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.85rem;
+    }
+    .admin-security-banner {
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      border-left: 4px solid #f59e0b;
+      border-radius: 6px;
+      padding: 0.75rem 0.85rem;
+      margin-bottom: 1.25rem;
+      font-size: 0.8rem;
+      color: #92400e;
+      line-height: 1.45;
+    }
+    .admin-security-banner strong {
+      color: #78350f;
+    }
+    @media (max-width: 600px) {
+      .role-selection-grid {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+      }
+      .form-grid-two {
+        grid-template-columns: 1fr;
+        gap: 0;
+      }
+      .register-card {
+        padding: 1.5rem 1.25rem;
+      }
+    }
+  </style>
+</head>
+<body class="login-page">
+
+  <!-- Centered Register Card (No Navigation Bar) -->
+  <main class="register-wrapper">
+    <div class="register-card">
+      
+      <!-- Project Branding -->
+      <div class="login-header">
+        <div class="login-brand-title">
+          RESQ<span class="accent-red">CARE</span>
+        </div>
+        <h1 class="login-heading" id="reg-role-heading">Create Account</h1>
+        <p class="login-subheading" id="reg-role-subheading">
+          Select your registration role to set up authorized system access
+        </p>
+      </div>
+
+      <!-- 1. Role Selection Cards: User, Driver, Admin -->
+      <div class="role-selection-grid" role="radiogroup" aria-label="Select Registration Role">
+        <button 
+          type="button" 
+          id="btn-role-user" 
+          class="role-card-btn active" 
+          role="radio" 
+          aria-checked="true" 
+          onclick="switchRegisterRole('USER')"
+        >
+          <span class="role-card-icon" aria-hidden="true">&#128100;</span>
+          <span class="role-card-title">User Registration</span>
+          <span class="role-card-subtitle">Citizen / Patient</span>
+        </button>
+
+        <button 
+          type="button" 
+          id="btn-role-driver" 
+          class="role-card-btn role-driver" 
+          role="radio" 
+          aria-checked="false" 
+          onclick="switchRegisterRole('DRIVER')"
+        >
+          <span class="role-card-icon" aria-hidden="true">&#128657;</span>
+          <span class="role-card-title">Driver Registration</span>
+          <span class="role-card-subtitle">Emergency Driver</span>
+        </button>
+
+        <button 
+          type="button" 
+          id="btn-role-admin" 
+          class="role-card-btn role-admin" 
+          role="radio" 
+          aria-checked="false" 
+          onclick="switchRegisterRole('ADMIN')"
+        >
+          <span class="role-card-icon" aria-hidden="true">&#128737;</span>
+          <span class="role-card-title">Admin Registration</span>
+          <span class="role-card-subtitle">Authorized Command</span>
+        </button>
+      </div>
+
+      <!-- Admin Security Notice (Visible only when Admin Registration is selected) -->
+      <div id="admin-security-notice" class="admin-security-banner" style="display: none;">
+        <strong>Security Requirement:</strong> Public registration does not grant administrator privileges automatically. An authorized administrator provisioning key or invitation code is required.
+      </div>
+
+      <!-- Live Feedback Alert Banner -->
+      <div id="register-alert" class="login-alert alert-danger" role="alert" aria-live="polite"></div>
+
+      <!-- Dynamic Registration Form -->
+      <form id="register-form" novalidate>
+
+        <!-- Full Name -->
+        <div class="login-form-group">
+          <label for="reg-name">Full Name <span style="color: #dc2626;">*</span></label>
+          <input 
+            type="text" 
+            id="reg-name" 
+            name="fullName" 
+            class="login-input" 
+            placeholder="e.g. John Doe" 
+            required 
+            autofocus 
+            autocomplete="name"
+          >
+          <span id="name-error" class="field-error-msg" style="display: none;"></span>
+        </div>
+
+        <!-- Email & Mobile Number Grid -->
+        <div class="form-grid-two">
+          <div class="login-form-group">
+            <label for="reg-email">Email Address <span style="color: #dc2626;">*</span></label>
+            <input 
+              type="email" 
+              id="reg-email" 
+              name="email" 
+              class="login-input" 
+              placeholder="e.g. john@example.com" 
+              required 
+              autocomplete="email"
+            >
+            <span id="email-error" class="field-error-msg" style="display: none;"></span>
+          </div>
+
+          <div class="login-form-group">
+            <label for="reg-phone">Mobile Number <span style="color: #dc2626;">*</span></label>
+            <input 
+              type="tel" 
+              id="reg-phone" 
+              name="phone" 
+              class="login-input" 
+              placeholder="e.g. 9876543210" 
+              required 
+              autocomplete="tel"
+            >
+            <span id="phone-error" class="field-error-msg" style="display: none;"></span>
+          </div>
+        </div>
+
+        <!-- Driver License Number (Visible ONLY for Driver Registration) -->
+        <div id="driver-license-group" class="login-form-group" style="display: none;">
+          <label for="reg-license">Driver Licence Number <span style="color: #dc2626;">*</span></label>
+          <input 
+            type="text" 
+            id="reg-license" 
+            name="licenseNumber" 
+            class="login-input" 
+            placeholder="e.g. DL-2024-8841" 
+            autocomplete="off"
+            style="text-transform: uppercase;"
+          >
+          <span id="license-error" class="field-error-msg" style="display: none;"></span>
+        </div>
+
+        <!-- Admin Security Key (Visible ONLY for Admin Registration) -->
+        <div id="admin-key-group" class="login-form-group" style="display: none;">
+          <label for="reg-admin-key">Administrator Security Key / Invitation Code <span style="color: #dc2626;">*</span></label>
+          <div class="password-input-wrapper">
+            <input 
+              type="password" 
+              id="reg-admin-key" 
+              name="adminSecurityKey" 
+              class="login-input" 
+              placeholder="Enter administrator invitation key" 
+              autocomplete="off"
+            >
+            <button 
+              type="button" 
+              id="admin-key-toggle-btn" 
+              class="password-toggle" 
+              aria-label="Toggle admin key visibility"
+              onclick="toggleFieldVisibility('reg-admin-key', 'admin-key-toggle-btn')"
+            >
+              Show
+            </button>
+          </div>
+          <span id="admin-key-error" class="field-error-msg" style="display: none;"></span>
+        </div>
+
+        <!-- Residential Address / City (Optional) -->
+        <div class="login-form-group">
+          <label for="reg-address">Address / City Landmark <span style="color: #64748b; font-weight: 400; font-size: 0.8rem;">(Optional)</span></label>
+          <input 
+            type="text" 
+            id="reg-address" 
+            name="address" 
+            class="login-input" 
+            placeholder="e.g. 42 Elm Street, Central Metro" 
+            autocomplete="street-address"
+          >
+        </div>
+
+        <!-- Password & Confirm Password Grid -->
+        <div class="form-grid-two">
+          <div class="login-form-group">
+            <label for="reg-password">Password <span style="color: #dc2626;">*</span></label>
+            <div class="password-input-wrapper">
+              <input 
+                type="password" 
+                id="reg-password" 
+                name="password" 
+                class="login-input" 
+                placeholder="At least 6 characters" 
+                required 
+                autocomplete="new-password"
+              >
+              <button 
+                type="button" 
+                id="password-toggle-btn" 
+                class="password-toggle" 
+                aria-label="Toggle password visibility"
+                onclick="toggleFieldVisibility('reg-password', 'password-toggle-btn')"
+              >
+                Show
+              </button>
+            </div>
+            <span id="password-error" class="field-error-msg" style="display: none;"></span>
+          </div>
+
+          <div class="login-form-group">
+            <label for="reg-confirm-password">Confirm Password <span style="color: #dc2626;">*</span></label>
+            <div class="password-input-wrapper">
+              <input 
+                type="password" 
+                id="reg-confirm-password" 
+                name="confirmPassword" 
+                class="login-input" 
+                placeholder="Re-type password" 
+                required 
+                autocomplete="new-password"
+              >
+              <button 
+                type="button" 
+                id="confirm-toggle-btn" 
+                class="password-toggle" 
+                aria-label="Toggle confirm password visibility"
+                onclick="toggleFieldVisibility('reg-confirm-password', 'confirm-toggle-btn')"
+              >
+                Show
+              </button>
+            </div>
+            <span id="confirm-error" class="field-error-msg" style="display: none;"></span>
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" id="btn-register" class="btn-submit-login">
+          Register as User
+        </button>
+      </form>
+
+      <!-- Bottom Links -->
+      <div class="login-links">
+        <p style="margin: 0 0 0.5rem 0;">
+          Already have an account? <a href="login.html" id="link-login-page">Sign in here</a>
+        </p>
+        <div class="login-divider-links">
+          <a href="index.html">Back to Home</a>
+        </div>
+      </div>
+
+      <!-- Security / Role Notice -->
+      <div class="login-security-notice">
+        Every account is securely registered in MySQL with BCrypt encryption. Access permissions and dashboard routing are strictly determined by server-verified roles.
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Core Scripts -->
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/ui.js"></script>
+
+  <script>
+    let currentRole = 'USER';
+    let isSubmitting = false;
+
+    /**
+     * Switch role selection (USER, DRIVER, ADMIN)
+     */
+    function switchRegisterRole(role) {
+      currentRole = role;
+
+      const btnUser = document.getElementById('btn-role-user');
+      const btnDriver = document.getElementById('btn-role-driver');
+      const btnAdmin = document.getElementById('btn-role-admin');
+
+      const heading = document.getElementById('reg-role-heading');
+      const subheading = document.getElementById('reg-role-subheading');
+      const submitBtn = document.getElementById('btn-register');
+      const loginLink = document.getElementById('link-login-page');
+
+      const driverLicenseGroup = document.getElementById('driver-license-group');
+      const adminKeyGroup = document.getElementById('admin-key-group');
+      const adminNotice = document.getElementById('admin-security-notice');
+
+      hideAlert();
+      clearAllErrors();
+
+      // Reset card active states
+      [btnUser, btnDriver, btnAdmin].forEach(btn => {
+        if (btn) {
+          btn.classList.remove('active');
+          btn.setAttribute('aria-checked', 'false');
+        }
+      });
+
+      if (role === 'ADMIN') {
+        if (btnAdmin) {
+          btnAdmin.classList.add('active');
+          btnAdmin.setAttribute('aria-checked', 'true');
+        }
+        if (heading) heading.textContent = 'Admin Registration';
+        if (subheading) subheading.textContent = 'Authorized provisioning for command center & operational control';
+        if (driverLicenseGroup) driverLicenseGroup.style.display = 'none';
+        if (adminKeyGroup) adminKeyGroup.style.display = 'block';
+        if (adminNotice) adminNotice.style.display = 'block';
+        if (submitBtn) submitBtn.textContent = 'Register as Administrator';
+        if (loginLink) loginLink.href = 'login.html?tab=admin';
+      } else if (role === 'DRIVER') {
+        if (btnDriver) {
+          btnDriver.classList.add('active');
+          btnDriver.setAttribute('aria-checked', 'true');
+        }
+        if (heading) heading.textContent = 'Driver Registration';
+        if (subheading) subheading.textContent = 'Register as emergency ambulance pilot / certified EMT paramedic';
+        if (driverLicenseGroup) driverLicenseGroup.style.display = 'block';
+        if (adminKeyGroup) adminKeyGroup.style.display = 'none';
+        if (adminNotice) adminNotice.style.display = 'none';
+        if (submitBtn) submitBtn.textContent = 'Register as Emergency Driver';
+        if (loginLink) loginLink.href = 'login.html?tab=driver';
+      } else {
+        currentRole = 'USER';
+        if (btnUser) {
+          btnUser.classList.add('active');
+          btnUser.setAttribute('aria-checked', 'true');
+        }
+        if (heading) heading.textContent = 'User Registration';
+        if (subheading) subheading.textContent = 'Create account to book emergency ambulances, locate hospitals & track rides';
+        if (driverLicenseGroup) driverLicenseGroup.style.display = 'none';
+        if (adminKeyGroup) adminKeyGroup.style.display = 'none';
+        if (adminNotice) adminNotice.style.display = 'none';
+        if (submitBtn) submitBtn.textContent = 'Register as User';
+        if (loginLink) loginLink.href = 'login.html?tab=user';
+      }
+    }
+
+    /**
+     * Toggle password visibility
+     */
+    function toggleFieldVisibility(inputId, btnId) {
+      const input = document.getElementById(inputId);
+      const btn = document.getElementById(btnId);
+      if (!input || !btn) return;
+
+      const isPassword = input.getAttribute('type') === 'password';
+      if (isPassword) {
+        input.setAttribute('type', 'text');
+        btn.textContent = 'Hide';
+        btn.setAttribute('aria-label', 'Hide');
+      } else {
+        input.setAttribute('type', 'password');
+        btn.textContent = 'Show';
+        btn.setAttribute('aria-label', 'Show');
+      }
+    }
+
+    function showFieldError(inputId, errorId, message) {
+      const input = document.getElementById(inputId);
+      const errorEl = document.getElementById(errorId);
+      if (input) {
+        input.classList.add('input-error');
+      }
+      if (errorEl) {
+        errorEl.textContent = message;
+        errorEl.style.display = 'block';
+      }
+    }
+
+    function clearFieldError(inputId, errorId) {
+      const input = document.getElementById(inputId);
+      const errorEl = document.getElementById(errorId);
+      if (input) input.classList.remove('input-error');
+      if (errorEl) {
+        errorEl.textContent = '';
+        errorEl.style.display = 'none';
+      }
+    }
+
+    function clearAllErrors() {
+      clearFieldError('reg-name', 'name-error');
+      clearFieldError('reg-email', 'email-error');
+      clearFieldError('reg-phone', 'phone-error');
+      clearFieldError('reg-license', 'license-error');
+      clearFieldError('reg-admin-key', 'admin-key-error');
+      clearFieldError('reg-password', 'password-error');
+      clearFieldError('reg-confirm-password', 'confirm-error');
+    }
+
+    function showAlert(message, type = 'danger') {
+      const alertEl = document.getElementById('register-alert');
+      if (!alertEl) return;
+      alertEl.className = `login-alert alert-${type}`;
+      alertEl.textContent = message;
+      alertEl.style.display = 'block';
+    }
+
+    function hideAlert() {
+      const alertEl = document.getElementById('register-alert');
+      if (!alertEl) return;
+      alertEl.style.display = 'none';
+      alertEl.textContent = '';
+    }
+
+    function setButtonLoading(loading, loadingText = 'Creating Account...') {
+      const btn = document.getElementById('btn-register');
+      if (!btn) return;
+
+      if (loading) {
+        btn.dataset.originalText = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = `<span class="login-spinner" aria-hidden="true"></span> ${loadingText}`;
+      } else {
+        btn.disabled = false;
+        if (btn.dataset.originalText) {
+          btn.innerHTML = btn.dataset.originalText;
+        } else {
+          btn.innerHTML = 'Register';
+        }
+      }
+    }
+
+    // Initialize Page
+    document.addEventListener('DOMContentLoaded', () => {
+      // Check query param (e.g. ?role=driver or ?role=admin)
+      const params = new URLSearchParams(window.location.search);
+      const roleParam = (params.get('role') || params.get('tab') || '').toUpperCase();
+      if (roleParam === 'DRIVER') {
+        switchRegisterRole('DRIVER');
+      } else if (roleParam === 'ADMIN') {
+        switchRegisterRole('ADMIN');
+      } else {
+        switchRegisterRole('USER');
+      }
+
+      // Input event listeners to clear errors on typing
+      ['reg-name', 'reg-email', 'reg-phone', 'reg-license', 'reg-admin-key', 'reg-password', 'reg-confirm-password'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+          el.addEventListener('input', () => {
+            const errId = id.replace('reg-', '') + '-error';
+            clearFieldError(id, errId);
+          });
+        }
+      });
+
+      // Form submission
+      const form = document.getElementById('register-form');
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (isSubmitting) return;
+
+        hideAlert();
+        clearAllErrors();
+
+        const fullName = document.getElementById('reg-name').value.trim();
+        const email = document.getElementById('reg-email').value.trim();
+        const phone = document.getElementById('reg-phone').value.trim();
+        const address = document.getElementById('reg-address').value.trim();
+        const password = document.getElementById('reg-password').value;
+        const confirmPassword = document.getElementById('reg-confirm-password').value;
+
+        const licenseNumber = document.getElementById('reg-license').value.trim();
+        const adminSecurityKey = document.getElementById('reg-admin-key').value.trim();
+
+        let hasError = false;
+
+        if (!fullName) {
+          showFieldError('reg-name', 'name-error', 'Full name is required.');
+          hasError = true;
+        }
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!email) {
+          showFieldError('reg-email', 'email-error', 'Email address is required.');
+          hasError = true;
+        } else if (!emailRegex.test(email)) {
+          showFieldError('reg-email', 'email-error', 'Please enter a valid email address.');
+          hasError = true;
+        }
+
+        if (!phone) {
+          showFieldError('reg-phone', 'phone-error', 'Mobile number is required.');
+          hasError = true;
+        } else if (phone.length < 7) {
+          showFieldError('reg-phone', 'phone-error', 'Please enter a valid mobile number.');
+          hasError = true;
+        }
+
+        if (currentRole === 'DRIVER') {
+          if (!licenseNumber) {
+            showFieldError('reg-license', 'license-error', 'Driver licence number is required for driver registration.');
+            hasError = true;
+          }
+        }
+
+        if (currentRole === 'ADMIN') {
+          if (!adminSecurityKey) {
+            showFieldError('reg-admin-key', 'admin-key-error', 'Administrator provisioning key or authorization code is required.');
+            hasError = true;
+          }
+        }
+
+        if (!password) {
+          showFieldError('reg-password', 'password-error', 'Password is required.');
+          hasError = true;
+        } else if (password.length < 6) {
+          showFieldError('reg-password', 'password-error', 'Password must be at least 6 characters.');
+          hasError = true;
+        }
+
+        if (!confirmPassword) {
+          showFieldError('reg-confirm-password', 'confirm-error', 'Please confirm your password.');
+          hasError = true;
+        } else if (password !== confirmPassword) {
+          showFieldError('reg-confirm-password', 'confirm-error', 'Passwords do not match.');
+          hasError = true;
+        }
+
+        if (hasError) return;
+
+        isSubmitting = true;
+        setButtonLoading(true, 'Creating Account in Database...');
+
+        try {
+          const payload = {
+            fullName,
+            email,
+            phone,
+            password,
+            confirmPassword,
+            address: address || null,
+            role: currentRole
+          };
+
+          if (currentRole === 'DRIVER') {
+            payload.licenseNumber = licenseNumber.toUpperCase();
+          }
+
+          if (currentRole === 'ADMIN') {
+            payload.adminSecurityKey = adminSecurityKey;
+          }
+
+          // Register account on backend -> saved in MySQL
+          const registeredUser = await Auth.register(payload);
+
+          showAlert(`Account registered successfully as ${currentRole}! Authenticating session...`, 'success');
+
+          // Log in with newly registered credentials
+          try {
+            const loggedInUser = await Auth.login(email, password);
+
+            // Server-verified role redirect
+            setTimeout(() => {
+              if (loggedInUser.role === 'ADMIN') {
+                window.location.replace('admin-dashboard.html');
+              } else if (loggedInUser.role === 'DRIVER') {
+                window.location.replace('driver-dashboard.html');
+              } else {
+                window.location.replace('dashboard.html');
+              }
+            }, 600);
+          } catch (loginErr) {
+            // In case automatic login requires admin approval or separate action
+            isSubmitting = false;
+            setButtonLoading(false);
+            showAlert('Registration complete! Please proceed to login.', 'success');
+            setTimeout(() => {
+              window.location.replace(`login.html?tab=${currentRole.toLowerCase()}&registered=1`);
+            }, 1200);
+          }
+
+        } catch (err) {
+          isSubmitting = false;
+          setButtonLoading(false);
+          const errorMsg = err.message || 'Registration failed. Please review your details and try again.';
+          showAlert(errorMsg, 'danger');
+        }
+      });
+    });
+  </script>
+</body>
+</html>

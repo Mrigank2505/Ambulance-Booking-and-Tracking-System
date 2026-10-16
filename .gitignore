@@ -1,0 +1,19 @@
+# Java / Maven
+backend/target/
+**/target/
+*.class
+*.jar
+*.war
+
+# VS Code
+.vscode/
+
+# local tooling
+.agents/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log

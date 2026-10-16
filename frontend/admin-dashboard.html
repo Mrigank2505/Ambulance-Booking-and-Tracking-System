@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Command Center - RESQCARE</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Dynamic Navbar -->
+  <div id="navbar-container"></div>
+
+  <div class="container" style="margin: 1.5rem auto 2.5rem auto;">
+    <!-- Admin Header -->
+    <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 1rem; margin-bottom: 1.25rem;">
+      <div>
+        <span style="font-size: 0.775rem; font-weight: 700; color: #dc2626; text-transform: uppercase;">Central Operations Oversight</span>
+        <h1 style="font-size: 1.5rem; font-weight: 800; color: #0f172a; margin-top: 0.2rem; margin-bottom: 0.2rem;">Executive Command Center</h1>
+        <p style="color: #64748b; font-size: 0.845rem; margin: 0;">System-wide telemetry, fleet health, response times, and emergency allocation metrics</p>
+      </div>
+
+      <!-- Quick Sub-navigation Buttons -->
+      <div style="display: flex; gap: 0.4rem; flex-wrap: wrap;">
+        <a href="admin-users.html" class="btn btn-outline btn-sm" style="font-size: 0.8125rem;">Users</a>
+        <a href="admin-drivers.html" class="btn btn-outline btn-sm" style="font-size: 0.8125rem;">Drivers</a>
+        <a href="admin-ambulances.html" class="btn btn-outline btn-sm" style="font-size: 0.8125rem;">Fleet</a>
+        <a href="admin-hospitals.html" class="btn btn-outline btn-sm" style="font-size: 0.8125rem;">Hospitals</a>
+        <a href="admin-bookings.html" class="btn btn-outline btn-sm" style="font-size: 0.8125rem;">All Trips</a>
+      </div>
+    </div>
+
+    <!-- KPI Metric Cards Grid -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem; margin-bottom: 1.25rem;">
+      <div class="card" style="padding: 1rem; border-left: 4px solid #1e3a8a;">
+        <span style="font-size: 0.725rem; color: #64748b; text-transform: uppercase;">Total Users</span>
+        <div id="stat-users" style="font-size: 1.45rem; font-weight: 800; color: #1e3a8a; margin-top: 0.2rem;">0</div>
+      </div>
+
+      <div class="card" style="padding: 1rem; border-left: 4px solid #0284c7;">
+        <span style="font-size: 0.725rem; color: #64748b; text-transform: uppercase;">Online Drivers</span>
+        <div style="font-size: 1.45rem; font-weight: 800; color: #0284c7; margin-top: 0.2rem;">
+          <span id="stat-online-drivers">0</span> <span style="font-size: 0.85rem; color: #64748b;">/ <span id="stat-drivers">0</span></span>
+        </div>
+      </div>
+
+      <div class="card" style="padding: 1.25rem; border-left: 4px solid #059669;">
+        <span style="font-size: 0.75rem; color: #64748b; text-transform: uppercase;">Available Fleet</span>
+        <div style="font-size: 1.85rem; font-weight: 800; color: #059669; margin-top: 0.25rem;">
+          <span id="stat-avail-ambulances">0</span> <span style="font-size: 1rem; color: #64748b;">/ <span id="stat-ambulances">0</span></span>
+        </div>
+      </div>
+
+      <div class="card" style="padding: 1.25rem; border-left: 4px solid #f59e0b;">
+        <span style="font-size: 0.75rem; color: #64748b; text-transform: uppercase;">Active Missions</span>
+        <div id="stat-active-trips" style="font-size: 1.85rem; font-weight: 800; color: #f59e0b; margin-top: 0.25rem;">0</div>
+      </div>
+
+      <div class="card" style="padding: 1.25rem; border-left: 4px solid #10b981;">
+        <span style="font-size: 0.75rem; color: #64748b; text-transform: uppercase;">Completed Trips</span>
+        <div id="stat-completed-trips" style="font-size: 1.85rem; font-weight: 800; color: #10b981; margin-top: 0.25rem;">0</div>
+      </div>
+
+      <div class="card" style="padding: 1.25rem; border-left: 4px solid #dc2626;">
+        <span style="font-size: 0.75rem; color: #64748b; text-transform: uppercase;">Critical Alarms</span>
+        <div id="stat-emergency-trips" style="font-size: 1.85rem; font-weight: 800; color: #dc2626; margin-top: 0.25rem;">0</div>
+      </div>
+    </div>
+
+    <!-- Analytics Chart & Fleet Summary -->
+    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
+      <div class="card" style="padding: 1.5rem;">
+        <div class="card-header" style="margin-bottom: 1rem;">
+          <h3 class="card-title">Live Dispatch Performance Chart</h3>
+          <span style="font-size: 0.8rem; color: #64748b;">Telemetry distribution</span>
+        </div>
+        <canvas id="analytics-chart" style="width: 100%; height: 240px; display: block;"></canvas>
+      </div>
+
+      <div class="card" style="padding: 1.5rem;">
+        <div class="card-header" style="margin-bottom: 1rem;">
+          <h3 class="card-title">Operations Shortcuts</h3>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+          <a href="admin-ambulances.html" class="btn btn-primary btn-sm" style="text-align: left; justify-content: flex-start;">
+            Add Ambulance to Fleet
+          </a>
+          <a href="admin-hospitals.html" class="btn btn-outline btn-sm" style="text-align: left; justify-content: flex-start;">
+            Register Hospital Facility
+          </a>
+          <a href="admin-users.html" class="btn btn-outline btn-sm" style="text-align: left; justify-content: flex-start;">
+            Audit User Roles & Accounts
+          </a>
+          <a href="admin-bookings.html" class="btn btn-outline btn-sm" style="text-align: left; justify-content: flex-start;">
+            Full Booking Master Log
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Emergency Trips Oversight -->
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Recent Emergency Dispatches Log</h3>
+        <a href="admin-bookings.html" class="btn btn-outline btn-sm">View All Trips</a>
+      </div>
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Trip Code</th>
+              <th>Patient</th>
+              <th>Assigned Unit</th>
+              <th>Emergency Type</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="admin-recent-tbody">
+            <tr><td colspan="6" style="text-align: center; padding: 2rem; color: #64748b;">Loading metrics...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/notifications.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/admin.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      AdminApp.initDashboard();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: ambulance-booking-system
+  jpa:
+    open-in-view: false
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:mysql}
+
+app:
+  jwt:
+    secret: ${JWT_SECRET:dGhpc0lzQVZlcnlTZWN1cmVKd3RTZWNyZXRLZXlGb3JBbWJ1bGFuY2VTeXN0ZW1EZXZlbG9wbWVudDIwMjY=}
+    expiration-ms: 86400000
+  security:
+    admin-key: ${ADMIN_SECURITY_KEY:ADMIN_SECURE_KEY_2026}
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: alpha
+
+logging:
+  level:
+    root: INFO
+    com.ambulance.system: DEBUG

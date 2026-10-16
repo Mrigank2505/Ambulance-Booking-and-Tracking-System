@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manage Drivers - Admin Console - RESQCARE</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Dynamic Navbar -->
+  <div id="navbar-container"></div>
+
+  <div class="container" style="margin: 1.5rem auto 2.5rem auto;">
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 1.25rem;">
+      <div>
+        <span style="font-size: 0.775rem; font-weight: 700; color: #dc2626; text-transform: uppercase;">Personnel Administration</span>
+        <h1 style="font-size: 1.5rem; font-weight: 800; color: #0f172a; margin-top: 0.2rem; margin-bottom: 0.2rem;">Ambulance Pilots & Drivers</h1>
+        <p style="color: #64748b; font-size: 0.845rem; margin: 0;">Monitor crew readiness, commercial driving licenses, and assigned emergency units</p>
+      </div>
+      <div>
+        <a href="admin-dashboard.html" class="btn btn-outline btn-sm">Back to Command Center</a>
+      </div>
+    </div>
+
+    <!-- Drivers Table Card -->
+    <div class="card">
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Driver Name</th>
+              <th>Email Address</th>
+              <th>Phone Number</th>
+              <th>License Number</th>
+              <th>Assigned Unit</th>
+              <th>Duty Status</th>
+            </tr>
+          </thead>
+          <tbody id="drivers-tbody">
+            <tr><td colspan="6" style="text-align: center; padding: 2rem; color: #64748b;">Loading driver records...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/notifications.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/admin.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      AdminApp.initDrivers();
+    });
+  </script>
+</body>
+</html>

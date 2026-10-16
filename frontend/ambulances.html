@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ambulance Fleet - RESQCARE</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="js/auth.js"></script>
+  <script>
+    if (!Auth.isAuthenticated()) {
+      window.location.replace('login.html?redirect=ambulances.html');
+    }
+  </script>
+</head>
+<body>
+
+  <!-- Dynamic Navbar -->
+  <div id="navbar-container"></div>
+
+  <div class="container" style="margin: 1.5rem auto 2.5rem auto;">
+    <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 1rem; margin-bottom: 1.25rem;">
+      <div>
+        <span style="font-size: 0.775rem; font-weight: 700; color: #1e3a8a; text-transform: uppercase;">Active Medical Fleet</span>
+        <h1 style="font-size: 1.5rem; font-weight: 800; color: #0f172a; margin-top: 0.2rem; margin-bottom: 0.2rem;">Emergency Response Fleet</h1>
+        <p style="color: #64748b; font-size: 0.845rem; margin: 0;">Real-time availability status, equipment specs, and location coordinates</p>
+      </div>
+      <div>
+        <a href="booking.html" class="btn btn-danger btn-pulse" style="font-size: 0.8125rem;">Quick Emergency Booking</a>
+      </div>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="card" style="margin-bottom: 1.25rem; padding: 1rem;">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; align-items: center;">
+        <div>
+          <div style="display: flex; justify-content: space-between; align-items: baseline;">
+            <label class="form-label" for="filter-type" style="margin-bottom: 0.25rem;">Filter by Type</label>
+            <span id="auto-filter-timer-badge" style="font-size: 0.75rem; color: #64748b; font-weight: 500;">Auto-selecting Basic in 10s</span>
+          </div>
+          <select id="filter-type" class="form-control">
+            <option value="">All Types</option>
+            <option value="BASIC">Basic Ambulance</option>
+            <option value="ICU">ICU Ambulance</option>
+            <option value="ALS">Advanced Life Support (ALS)</option>
+          </select>
+        </div>
+        <div>
+          <label class="form-label" for="filter-status">Availability Status</label>
+          <select id="filter-status" class="form-control">
+            <option value="">All Statuses</option>
+            <option value="AVAILABLE" selected>Available for Dispatch Only</option>
+            <option value="ASSIGNED">Assigned / On Trip</option>
+          </select>
+        </div>
+        <div>
+          <label class="form-label" for="search-input">Search Fleet</label>
+          <input type="text" id="search-input" class="form-control" placeholder="Search by number or equipment...">
+        </div>
+      </div>
+    </div>
+
+    <!-- Fleet Grid -->
+    <div id="fleet-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem;">
+      <div style="grid-column: 1 / -1; text-align: center; padding: 3rem; color: #64748b;">
+        <div class="spinner" style="margin: 0 auto 1rem auto;"></div>
+        Loading fleet units...
+      </div>
+    </div>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/notifications.js"></script>
+  <script src="js/ui.js"></script>
+  <script>
+    let allFleet = [];
+
+    // -------------------------------------------------------------------------
+    // Automatic Ambulance Type Filter Selection After 10 Seconds
+    // -------------------------------------------------------------------------
+    const AUTO_SELECT_DELAY_MS = 10000; // Exactly 10 seconds
+    const AUTO_SELECT_DEFAULT_TYPE = 'BASIC'; // Basic Ambulance
+    let autoSelectTimer = null;
+    let countdownInterval = null;
+    let secondsRemaining = 10;
+    let userHasInteracted = false;
+
+    function startAutoSelectTimer() {
+      if (userHasInteracted || autoSelectTimer) return;
+
+      secondsRemaining = 10;
+      updateTimerBadge();
+
+      // Tick down countdown every second for clear, transparent feedback
+      countdownInterval = setInterval(() => {
+        if (userHasInteracted) {
+          clearInterval(countdownInterval);
+          return;
+        }
+        secondsRemaining--;
+        if (secondsRemaining <= 0) {
+          clearInterval(countdownInterval);
+        } else {
+          updateTimerBadge();
+        }
+      }, 1000);
+
+      // Trigger automatic selection after exactly 10 seconds
+      autoSelectTimer = setTimeout(() => {
+        if (userHasInteracted) return;
+
+        const typeSelect = document.getElementById('filter-type');
+        if (typeSelect && typeSelect.value === '') {
+          typeSelect.value = AUTO_SELECT_DEFAULT_TYPE;
+          const badge = document.getElementById('auto-filter-timer-badge');
+          if (badge) {
+            badge.innerHTML = '<span style="color: #059669; font-weight: 600;">Auto-selected: Basic Ambulance</span>';
+          }
+          // Explicitly invoke existing filtering logic to refresh list
+          renderFleet();
+        }
+        clearTimers();
+      }, AUTO_SELECT_DELAY_MS);
+    }
+
+    function updateTimerBadge() {
+      const badge = document.getElementById('auto-filter-timer-badge');
+      if (!badge || userHasInteracted) return;
+      badge.textContent = `Auto-defaulting to Basic in ${secondsRemaining}s`;
+    }
+
+    function cancelAutoSelectTimer(reason = 'User interaction') {
+      userHasInteracted = true;
+      clearTimers();
+      const badge = document.getElementById('auto-filter-timer-badge');
+      if (badge) {
+        badge.style.display = 'none';
+      }
+    }
+
+    function clearTimers() {
+      if (autoSelectTimer) {
+        clearTimeout(autoSelectTimer);
+        autoSelectTimer = null;
+      }
+      if (countdownInterval) {
+        clearInterval(countdownInterval);
+        countdownInterval = null;
+      }
+    }
+
+    function resetTypeFilter() {
+      cancelAutoSelectTimer('Manual reset');
+      const typeSelect = document.getElementById('filter-type');
+      if (typeSelect) {
+        typeSelect.value = '';
+      }
+      renderFleet();
+    }
+
+    async function loadFleet() {
+      const grid = document.getElementById('fleet-grid');
+      grid.innerHTML = `
+        <div style="grid-column: 1 / -1; text-align: center; padding: 3rem; color: #64748b;">
+          <div class="spinner" style="margin: 0 auto 1rem auto;"></div>
+          <p>Loading fleet units from dispatch network...</p>
+        </div>
+      `;
+      try {
+        allFleet = await api.get('/ambulances');
+        renderFleet();
+      } catch (err) {
+        grid.innerHTML = `
+          <div class="card" style="grid-column: 1 / -1; text-align: center; padding: 3rem; border-left: 4px solid #dc2626;">
+            <div style="font-size: 0.85rem; font-weight: 700; color: #dc2626; text-transform: uppercase; margin-bottom: 0.5rem;">Connection Notice</div>
+            <h3 style="color: #0f172a; margin-bottom: 0.5rem;">Unable to load ambulance fleet</h3>
+            <p style="color: #64748b; font-size: 0.9rem; margin-bottom: 1.25rem;">${err.message || 'Network or server communication failure.'}</p>
+            <button onclick="loadFleet()" class="btn btn-primary btn-sm">↻ Retry Loading Fleet</button>
+          </div>
+        `;
+      }
+    }
+
+    function renderFleet() {
+      const typeFilter = document.getElementById('filter-type').value;
+      const statusFilter = document.getElementById('filter-status').value;
+      const search = document.getElementById('search-input').value.toLowerCase().trim();
+      const grid = document.getElementById('fleet-grid');
+
+      let filtered = allFleet.filter(a => {
+        if (typeFilter && a.ambulanceType !== typeFilter) return false;
+        if (statusFilter && a.availabilityStatus !== statusFilter) return false;
+        if (search) {
+          const matchNum = a.ambulanceNumber.toLowerCase().includes(search);
+          const matchEquip = a.equipmentDetails && a.equipmentDetails.toLowerCase().includes(search);
+          const matchDriver = a.driverName && a.driverName.toLowerCase().includes(search);
+          if (!matchNum && !matchEquip && !matchDriver) return false;
+        }
+        return true;
+      });
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `
+          <div class="card" style="grid-column: 1 / -1; text-align: center; padding: 3rem;">
+            <div style="font-size: 0.85rem; font-weight: 700; color: #64748b; text-transform: uppercase; margin-bottom: 0.5rem;">Fleet Status</div>
+            <h3 style="color: #0f172a; margin-bottom: 0.5rem;">No ambulances available for this type.</h3>
+            <p style="color: #64748b; font-size: 0.9rem; margin-bottom: 1.25rem;">Try selecting a different specification or clearing the filter.</p>
+            <button id="reset-filter-btn" onclick="resetTypeFilter()" class="btn btn-outline btn-sm">Reset Filter to All Types</button>
+          </div>
+        `;
+        return;
+      }
+
+      grid.innerHTML = filtered.map(a => `
+        <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+              <div>
+                <span class="badge ${a.ambulanceType === 'ICU' ? 'badge-critical' : (a.ambulanceType === 'ALS' ? 'badge-serious' : 'badge-normal')}">${a.ambulanceType}</span>
+                <h3 style="font-size: 1.25rem; font-weight: 800; color: #0f172a; margin-top: 0.25rem;">${a.ambulanceNumber}</h3>
+              </div>
+              ${UI.formatStatusBadge(a.availabilityStatus)}
+            </div>
+
+            <p style="font-size: 0.85rem; color: #475569; margin-bottom: 0.75rem; min-height: 40px;">
+              <strong>Medical Gear:</strong> ${a.equipmentDetails || 'Standard emergency kit, Oxygen, Stretcher'}
+            </p>
+
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 0.75rem; font-size: 0.85rem; margin-bottom: 1.25rem;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
+                <span style="color: #64748b;">Pilot / Driver:</span>
+                <strong style="color: #0f172a;">${a.driverName || 'Standby Crew'}</strong>
+              </div>
+              <div style="display: flex; justify-content: space-between;">
+                <span style="color: #64748b;">Patient Capacity:</span>
+                <strong style="color: #0f172a;">${a.capacity} Bed</strong>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            ${a.availabilityStatus === 'AVAILABLE' ? `
+              <a href="booking.html" class="btn btn-primary" style="width: 100%;">
+                Book This Unit
+              </a>
+            ` : `
+              <button class="btn btn-outline" style="width: 100%; opacity: 0.7;" disabled>
+                Unit Currently In-Mission
+              </button>
+            `}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      if (!Auth.requireAuth()) return;
+      UI.renderNavbar('ambulances');
+      loadFleet();
+      startAutoSelectTimer();
+
+      const typeSelect = document.getElementById('filter-type');
+      if (typeSelect) {
+        // Genuine user interaction immediately cancels auto-select timer
+        typeSelect.addEventListener('change', () => {
+          cancelAutoSelectTimer('User changed filter dropdown');
+          renderFleet();
+        });
+        typeSelect.addEventListener('mousedown', () => {
+          cancelAutoSelectTimer('User clicked dropdown');
+        });
+        typeSelect.addEventListener('keydown', (e) => {
+          if (['ArrowDown', 'ArrowUp', 'Enter', ' '].includes(e.key)) {
+            cancelAutoSelectTimer('User used keyboard navigation on filter');
+          }
+        });
+      }
+
+      document.getElementById('filter-status').addEventListener('change', renderFleet);
+      document.getElementById('search-input').addEventListener('input', renderFleet);
+
+      // Clean up timer upon disposal / navigation
+      window.addEventListener('beforeunload', () => {
+        clearTimers();
+      });
+    });
+  </script>
+</body>
+</html>

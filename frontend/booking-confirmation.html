@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Booking Confirmed - RESQCARE</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="js/auth.js"></script>
+  <script>
+    if (!Auth.isAuthenticated()) {
+      window.location.replace('login.html?redirect=booking-confirmation.html');
+    }
+  </script>
+</head>
+<body>
+
+  <!-- Dynamic Navbar -->
+  <div id="navbar-container"></div>
+
+  <div class="container" style="max-width: 680px; margin: 1.5rem auto 2.5rem auto;">
+    <div class="card" style="padding: 1.25rem; text-align: center;">
+      <div id="conf-icon" style="width: 52px; height: 52px; background: #ecfdf5; color: #059669; font-weight: 800; font-size: 0.95rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem auto; border: 2px solid #a7f3d0;">
+        OK
+      </div>
+
+      <span id="conf-top-badge" class="badge badge-available" style="margin-bottom: 0.35rem; font-size: 0.7rem;">DISPATCH CONFIRMED</span>
+      <h2 id="conf-heading" style="font-size: 1.35rem; font-weight: 800; color: #0f172a; margin-bottom: 0.35rem;">Ambulance Dispatched!</h2>
+      <p id="conf-subheading" style="color: #64748b; font-size: 0.845rem; margin-bottom: 1.25rem;">The nearest available unit has been allocated and notified.</p>
+
+      <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 1rem; text-align: left; margin-bottom: 1.25rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.75rem; margin-bottom: 1rem;">
+          <div>
+            <span style="font-size: 0.75rem; color: #64748b; text-transform: uppercase;">Booking Reference & ID</span>
+            <div style="display: flex; align-items: baseline; gap: 0.5rem; flex-wrap: wrap;">
+              <div id="conf-code" style="font-size: 1.25rem; font-weight: 800; color: #1e3a8a;">Loading...</div>
+              <span id="conf-id-badge" style="font-size: 0.85rem; color: #64748b; font-weight: 700; background: #e2e8f0; padding: 2px 8px; border-radius: 4px;">ID: #...</span>
+            </div>
+          </div>
+          <div id="conf-status">
+            <span class="badge badge-ontrip">ASSIGNED</span>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.75rem;">
+          <div>
+            <span style="font-size: 0.75rem; color: #64748b;">REGISTERED PATIENT</span>
+            <p id="conf-patient" style="font-weight: 700; color: #0f172a;">Loading patient...</p>
+          </div>
+          <div>
+            <span style="font-size: 0.75rem; color: #64748b;">CONTACT NUMBER</span>
+            <p id="conf-phone" style="font-weight: 700; color: #0f172a;">Loading contact...</p>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
+          <div>
+            <span style="font-size: 0.75rem; color: #64748b;">AMBULANCE TYPE & VEHICLE</span>
+            <p id="conf-amb" style="font-weight: 700; color: #0f172a;">Critical Care / ICU</p>
+          </div>
+          <div>
+            <span style="font-size: 0.75rem; color: #64748b;">DRIVER IN-CHARGE</span>
+            <p id="conf-driver" style="font-weight: 700; color: #0f172a;">Allocating driver...</p>
+          </div>
+          <div>
+            <span style="font-size: 0.75rem; color: #64748b;">ESTIMATED ARRIVAL</span>
+            <p id="conf-eta" style="font-weight: 800; color: #dc2626; font-size: 1.1rem;">Calculating...</p>
+          </div>
+          <div>
+            <span style="font-size: 0.75rem; color: #64748b;">DESTINATION HOSPITAL</span>
+            <p id="conf-hosp" style="font-weight: 700; color: #0f172a;">City Emergency Hospital</p>
+          </div>
+        </div>
+
+        <div style="border-top: 1px solid #e2e8f0; padding-top: 0.75rem;">
+          <span style="font-size: 0.75rem; color: #64748b;">PATIENT PICKUP ADDRESS</span>
+          <p id="conf-pickup" style="color: #334155; font-size: 0.95rem;">Loading address...</p>
+        </div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+        <a id="conf-track-btn" href="#" class="btn btn-danger btn-lg btn-pulse">
+          Track Location in Real Time
+        </a>
+        <a href="dashboard.html" class="btn btn-outline">
+          Return to My Dashboard
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/notifications.js"></script>
+  <script src="js/ui.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      if (!Auth.requireAuth()) return;
+      UI.renderNavbar();
+
+      const params = new URLSearchParams(window.location.search);
+      const bookingId = params.get('id');
+
+      if (!bookingId) {
+        window.location.href = 'booking.html';
+        return;
+      }
+
+      try {
+        const b = await api.get(`/bookings/${bookingId}`);
+        document.getElementById('conf-code').textContent = b.bookingCode;
+        if (document.getElementById('conf-id-badge')) {
+          document.getElementById('conf-id-badge').textContent = `Booking ID: #${b.id}`;
+        }
+        
+        const typeLabels = {
+          'BASIC': 'Basic Ambulance',
+          'ALS': 'Advanced Life Support (ALS)',
+          'ICU': 'Critical Care / ICU Ambulance'
+        };
+        const typeDisplay = typeLabels[b.ambulanceType] || b.ambulanceType;
+        
+        const isAssigned = !!(b.ambulanceNumber && b.bookingStatus !== 'SEARCHING' && b.bookingStatus !== 'REQUESTED');
+
+        const topBadge = document.getElementById('conf-top-badge');
+        const heading = document.getElementById('conf-heading');
+        const subheading = document.getElementById('conf-subheading');
+        const iconEl = document.getElementById('conf-icon');
+
+        if (isAssigned) {
+          if (topBadge) {
+            topBadge.className = 'badge badge-available';
+            topBadge.textContent = 'DISPATCH CONFIRMED';
+          }
+          if (heading) heading.textContent = 'Ambulance Dispatched!';
+          if (subheading) subheading.textContent = 'The nearest available unit has been allocated and notified.';
+          if (iconEl) {
+            iconEl.textContent = 'OK';
+            iconEl.style.background = '#ecfdf5';
+            iconEl.style.color = '#059669';
+            iconEl.style.borderColor = '#a7f3d0';
+          }
+          document.getElementById('conf-amb').textContent = `${typeDisplay} (${b.ambulanceNumber})`;
+          document.getElementById('conf-driver').textContent = b.driverName ? `${b.driverName} • ${b.driverPhone || ''}` : 'Dispatched unit';
+          document.getElementById('conf-eta').textContent = b.estimatedArrivalTime || 'En-route';
+        } else {
+          // If an ambulance is not yet assigned:
+          if (topBadge) {
+            topBadge.className = 'badge badge-serious';
+            topBadge.textContent = 'SEARCHING FOR UNIT';
+          }
+          if (heading) heading.textContent = 'Searching for an available critical ambulance';
+          if (subheading) subheading.textContent = 'Your booking is confirmed in our database. Dispatch telemetry is actively querying nearest standby units.';
+          if (iconEl) {
+            iconEl.textContent = '...';
+            iconEl.style.background = '#fffbeb';
+            iconEl.style.color = '#d97706';
+            iconEl.style.borderColor = '#fde68a';
+          }
+          document.getElementById('conf-amb').textContent = typeDisplay;
+          document.getElementById('conf-driver').textContent = 'Allocating standby paramedic crew...';
+          document.getElementById('conf-eta').textContent = 'Searching nearby units...';
+        }
+
+        if (document.getElementById('conf-patient')) {
+          document.getElementById('conf-patient').textContent = b.patientName || 'Emergency Patient';
+        }
+        if (document.getElementById('conf-phone')) {
+          document.getElementById('conf-phone').textContent = b.patientPhone || 'N/A';
+        }
+
+        document.getElementById('conf-hosp').textContent = b.hospitalName || b.destinationAddress || 'General Hospital';
+        document.getElementById('conf-pickup').textContent = b.pickupAddress;
+        document.getElementById('conf-status').innerHTML = UI.formatStatusBadge(b.bookingStatus);
+
+        document.getElementById('conf-track-btn').href = `tracking.html?id=${b.id}`;
+      } catch (err) {
+        UI.showToast('Could not load booking details: ' + err.message, 'error');
+      }
+    });
+  </script>
+</body>
+</html>

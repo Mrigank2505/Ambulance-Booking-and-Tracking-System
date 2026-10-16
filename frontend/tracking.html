@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Track Location - RESQCARE</title>
+  <meta name="description" content="Real-time emergency dispatch tracking, live GPS telemetry, estimated arrival time, and hospital route monitoring.">
+  
+  <!-- Leaflet CSS for OpenStreetMap integration -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  
+  <!-- Design System & Styles -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/tracking.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="js/auth.js"></script>
+  <script>
+    if (!Auth.isAuthenticated()) {
+      const page = window.location.pathname.split('/').pop() || 'tracking.html';
+      window.location.replace('login.html?redirect=' + encodeURIComponent(page + window.location.search));
+    }
+  </script>
+</head>
+<body>
+
+  <!-- Universal Dynamic Navigation Bar -->
+  <div id="navbar-container"></div>
+
+  <main class="container" style="max-width: 1200px; margin: 2rem auto 4rem auto;">
+    
+    <!-- Header Section -->
+    <header class="tracking-header">
+      <div class="tracking-title-wrap">
+        <div>
+          <h1 id="page-heading">
+            <span>Track</span> <span class="highlight">Location</span>
+          </h1>
+          <p style="color: var(--text-muted); font-size: 0.95rem; margin-top: 0.25rem;">
+            Real-time emergency telemetry, vehicle dispatch telemetry, and hospital transit updates.
+          </p>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+          <button id="btn-use-location" class="btn btn-outline btn-sm" title="Request browser GPS location">
+            Use My Location
+          </button>
+          <div id="connection-pill" class="tracking-badge-live">
+            <span class="live-pulse-dot"></span>
+            <span id="connection-status-text">Live Telemetry Ready</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Booking ID Search Card -->
+      <div class="search-card" style="padding: 1rem 1.25rem; margin-bottom: 1.25rem;">
+        <form id="tracking-search-form" class="search-form-row" onsubmit="event.preventDefault();" style="gap: 0.5rem;">
+          <div class="search-input-wrap" style="flex: 1;">
+            <input 
+              type="text" 
+              id="booking-id-input" 
+              placeholder="Enter Booking ID or Reference Code (e.g. BK-1001, BK-1002, BK-1003 or Database ID)" 
+              autocomplete="off"
+              spellcheck="false"
+              required
+              style="padding: 0.5rem 0.85rem; font-size: 0.85rem;"
+            />
+          </div>
+          <button type="submit" id="btn-track-ambulance" class="btn btn-primary" style="padding: 0.5rem 1.25rem; font-weight: 700;">
+            Track Location
+          </button>
+        </form>
+
+        <!-- Quick Sample Test Chips in Tamil Nadu -->
+        <div class="sample-chips-row" style="margin-top: 0.75rem; font-size: 0.775rem;">
+          <span>Tamil Nadu Live Corridors:</span>
+          <button type="button" class="sample-chip" onclick="TrackingApp.trackBookingById('BK-1001')">
+            Chennai (BK-1001 ALS)
+          </button>
+          <button type="button" class="sample-chip" onclick="TrackingApp.trackBookingById('BK-1002')">
+            Coimbatore (BK-1002 ICU)
+          </button>
+          <button type="button" class="sample-chip" onclick="TrackingApp.trackBookingById('BK-1003')">
+            Madurai (BK-1003 BLS)
+          </button>
+        </div>
+      </div>
+
+      <!-- Error Alert Box -->
+      <div id="tracking-error-box" class="tracking-alert alert-error" style="display: none; padding: 0.75rem 1rem; font-size: 0.8125rem;">
+        <div style="flex: 1;">
+          <strong id="tracking-error-title" style="display: block; margin-bottom: 0.2rem;">Booking Not Found</strong>
+          <span id="tracking-error-msg">Please enter a valid Booking Reference Code or select one of the regional corridor samples above.</span>
+        </div>
+        <button type="button" onclick="document.getElementById('tracking-error-box').style.display='none'" style="background: none; border: none; font-size: 1.1rem; cursor: pointer; color: #991b1b;">&times;</button>
+      </div>
+
+      <!-- Demo Simulation Mode Banner -->
+      <div id="demo-simulation-banner" class="demo-banner" style="display: none; padding: 0.85rem 1.15rem; margin-bottom: 1.25rem;">
+        <div class="demo-banner-header">
+          <div class="demo-banner-title" style="font-size: 0.85rem; font-weight: 700;">
+            <span>STANDALONE DEMO CORRIDOR ACTIVE</span>
+          </div>
+          <span class="badge" style="background: #fef3c7; color: #92400e; border: 1px solid #fde68a; font-size: 0.7rem;">
+            DEMONSTRATION ROUTE DATA
+          </span>
+        </div>
+        <p class="demo-banner-desc" style="font-size: 0.775rem; margin-top: 0.35rem; margin-bottom: 0.65rem;">
+          Demonstration Mode: Simulating emergency ambulance telemetry along validated Tamil Nadu highway corridors. (Live GPS streaming will activate automatically when a live vehicle unit reports coordinates).
+        </p>
+        <div class="demo-controls-bar" style="gap: 0.5rem;">
+          <button type="button" id="btn-demo-toggle" class="btn btn-sm btn-primary" style="background: #d97706; border-color: #d97706; font-size: 0.75rem;">
+            Pause Simulation
+          </button>
+          <button type="button" id="btn-demo-step" class="btn btn-sm btn-outline" style="border-color: #d97706; color: #92400e; font-size: 0.75rem;">
+            Next Step
+          </button>
+          <button type="button" id="btn-demo-reset" class="btn btn-sm btn-outline" style="border-color: #d97706; color: #92400e; font-size: 0.75rem;">
+            Reset
+          </button>
+          <span id="sim-speed-label" style="font-size: 0.75rem; color: #92400e; margin-left: auto;">
+            Auto-stepping: 3s
+          </span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Active Tracking Dashboard Container (Visible immediately) -->
+    <div id="active-tracking-dashboard">
+      
+      <!-- 6-Stage Booking Status Timeline Card -->
+      <section class="timeline-card" id="timeline-card-section" style="margin-bottom: 1.25rem;">
+        <div class="timeline-header" style="margin-bottom: 0.75rem;">
+          <div class="timeline-title" style="font-size: 0.95rem; font-weight: 700;">
+            <span>Booking Progress Timeline</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <span style="font-size: 0.775rem; color: var(--text-muted);">Current Status:</span>
+            <div id="timeline-current-status-badge">
+              <span class="badge badge-ontrip">TAMIL NADU STANDBY</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="stepper-container">
+          <div class="stepper-track-bg"></div>
+          <div id="stepper-progress-bar" class="stepper-track-progress"></div>
+          
+          <ol class="stepper-steps">
+            <!-- Stage 1 -->
+            <li class="step-node" id="timeline-step-1">
+              <div class="step-circle" id="circle-1">1</div>
+              <div class="step-title">Booking Confirmed</div>
+              <div class="step-time" id="time-step-1">--:--</div>
+            </li>
+            
+            <!-- Stage 2 -->
+            <li class="step-node" id="timeline-step-2">
+              <div class="step-circle" id="circle-2">2</div>
+              <div class="step-title">Ambulance Assigned</div>
+              <div class="step-time" id="time-step-2">--:--</div>
+            </li>
+            
+            <!-- Stage 3 -->
+            <li class="step-node" id="timeline-step-3">
+              <div class="step-circle" id="circle-3">3</div>
+              <div class="step-title">Driver Accepted</div>
+              <div class="step-time" id="time-step-3">--:--</div>
+            </li>
+            
+            <!-- Stage 4 -->
+            <li class="step-node" id="timeline-step-4">
+              <div class="step-circle" id="circle-4">4</div>
+              <div class="step-title">Ambulance On the Way</div>
+              <div class="step-time" id="time-step-4">--:--</div>
+            </li>
+            
+            <!-- Stage 5 -->
+            <li class="step-node" id="timeline-step-5">
+              <div class="step-circle" id="circle-5">5</div>
+              <div class="step-title">Patient Picked Up</div>
+              <div class="step-time" id="time-step-5">--:--</div>
+            </li>
+            
+            <!-- Stage 6 -->
+            <li class="step-node" id="timeline-step-6">
+              <div class="step-circle" id="circle-6">6</div>
+              <div class="step-title">Reached Hospital</div>
+              <div class="step-time" id="time-step-6">--:--</div>
+            </li>
+          </ol>
+        </div>
+      </section>
+
+      <!-- Telemetry Metric HUD -->
+      <section class="telemetry-grid">
+        <!-- ETA Card -->
+        <div class="telemetry-card highlight-eta">
+          <div>
+            <div class="telemetry-label">Estimated Arrival</div>
+            <div id="hud-eta" class="telemetry-val">-- mins</div>
+            <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.2rem;">Live traffic adjusted</div>
+          </div>
+        </div>
+
+        <!-- Distance Remaining Card -->
+        <div class="telemetry-card highlight-dist">
+          <div>
+            <div class="telemetry-label">Distance Remaining</div>
+            <div id="hud-distance" class="telemetry-val">-- km</div>
+            <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.2rem;">Direct GPS route</div>
+          </div>
+        </div>
+
+        <!-- Vehicle Velocity -->
+        <div class="telemetry-card highlight-speed">
+          <div>
+            <div class="telemetry-label">Vehicle Velocity</div>
+            <div id="hud-speed" class="telemetry-val">-- km/h</div>
+            <div style="font-size: 0.75rem; color: #059669; margin-top: 0.2rem;">Emergency lights active</div>
+          </div>
+        </div>
+
+        <!-- Ambulance Availability & Booking Status -->
+        <div class="telemetry-card highlight-status">
+          <div>
+            <div class="telemetry-label">Fleet Status</div>
+            <div id="hud-status-badge" style="margin-top: 0.35rem;">
+              <span class="badge badge-ontrip">DISPATCHED</span>
+            </div>
+            <div id="hud-availability-text" style="font-size: 0.75rem; color: #059669; margin-top: 0.3rem;">
+              Unit Status: In-Transit
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Two-Column Interactive Map and Mission Detail Layout -->
+      <section class="tracking-workspace">
+        
+        <!-- Left Column: Leaflet Interactive Map -->
+        <div class="map-card">
+          <div class="map-card-header">
+            <div class="map-card-title">
+              <span>Live Emergency Navigation Map</span>
+            </div>
+            <div class="map-toolbar">
+              <button type="button" id="btn-center-ambulance" class="btn btn-outline btn-sm" title="Center map on ambulance">
+                Center Ambulance
+              </button>
+              <button type="button" id="btn-center-route" class="btn btn-outline btn-sm" title="Fit entire route bounds">
+                Fit Route
+              </button>
+            </div>
+          </div>
+
+          <!-- Leaflet Map Container -->
+          <div id="tracking-map"></div>
+          
+          <div style="padding: 0.75rem 1.25rem; background: #f8fafc; border-top: 1px solid var(--border); display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; font-size: 0.775rem; color: var(--text-muted); gap: 0.5rem;">
+            <div style="display: flex; gap: 1rem; align-items: center;">
+              <span>Patient Pickup (P)</span>
+              <span>Destination Hospital (H)</span>
+              <span>Ambulance Unit (AMB)</span>
+            </div>
+            <div>Powered by OpenStreetMap and Leaflet.js</div>
+          </div>
+        </div>
+
+        <!-- Right Column: Mission, Patient, Driver & Vehicle Cards -->
+        <div class="details-column">
+          
+          <!-- Trip & Locations Card -->
+          <div class="detail-card">
+            <div class="detail-card-header">
+              <div class="detail-card-title">
+                <span>Transit Route Details</span>
+              </div>
+              <span id="detail-booking-code" class="badge" style="background: #eff6ff; color: #1e3a8a; font-weight: 800;">
+                BK-0000
+              </span>
+            </div>
+
+            <!-- Patient Pickup Location -->
+            <div class="info-row">
+              <div class="info-content">
+                <span class="info-label">Patient Pickup Location</span>
+                <div id="detail-pickup-address" class="info-value">Loading address...</div>
+                <div id="detail-patient-meta" style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.15rem;">
+                  Patient: --
+                </div>
+              </div>
+            </div>
+
+            <!-- Destination Hospital -->
+            <div class="info-row" style="margin-top: 1rem;">
+              <div class="info-content">
+                <span class="info-label">Destination Hospital</span>
+                <div id="detail-hospital-name" class="info-value">Loading hospital...</div>
+                <div id="detail-destination-address" style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.15rem;">
+                  --
+                </div>
+              </div>
+            </div>
+
+            <!-- Emergency Type & Notes -->
+            <div style="margin-top: 1rem; padding-top: 0.85rem; border-top: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <span class="info-label">Emergency Category</span>
+                <span id="detail-emergency-type" class="badge badge-critical">CRITICAL</span>
+              </div>
+              <a href="tel:108" class="btn-emergency-call" title="Emergency Services">
+                Emergency: 108
+              </a>
+            </div>
+          </div>
+
+          <!-- Ambulance Vehicle & Unit Specs Card -->
+          <div class="detail-card">
+            <div class="detail-card-header">
+              <div class="detail-card-title">
+                <span>Assigned Unit</span>
+              </div>
+              <span id="detail-ambulance-type" class="badge badge-available">
+                ICU MOBILE
+              </span>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+              <div>
+                <span class="info-label">Ambulance Vehicle ID</span>
+                <div id="detail-ambulance-id" style="font-size: 1.15rem; font-weight: 800; color: #1e3a8a;">
+                  AMB-ICU-101
+                </div>
+              </div>
+              <div>
+                <span class="info-label">Fleet Availability</span>
+                <span id="detail-ambulance-status" class="badge badge-available">DISPATCHED</span>
+              </div>
+            </div>
+
+            <!-- Equipment specs -->
+            <div class="specs-pill-container" id="detail-specs-container">
+              <span class="spec-pill">Ventilator Ready</span>
+              <span class="spec-pill">Cardiac Defibrillator</span>
+              <span class="spec-pill">Oxygen Pipeline</span>
+              <span class="spec-pill">GPS Telemetry Live</span>
+            </div>
+          </div>
+
+          <!-- Driver & Pilot Details Card -->
+          <div class="detail-card">
+            <div class="detail-card-header">
+              <div class="detail-card-title">
+                <span>Paramedic / Driver</span>
+              </div>
+              <span id="detail-driver-rating" style="font-size: 0.8rem; font-weight: 700; color: #d97706;">Rating: 4.9 (420+ trips)</span>
+            </div>
+
+            <div class="driver-profile">
+              <div id="detail-driver-avatar" class="driver-avatar-badge">MR</div>
+              <div>
+                <div id="detail-driver-name" style="font-size: 1.05rem; font-weight: 800; color: var(--text-main);">
+                  Michael Ross
+                </div>
+                <div style="font-size: 0.8rem; color: var(--text-muted);">
+                  Emergency Medical Technician (EMT-P)
+                </div>
+                <div id="detail-driver-phone-display" style="font-size: 0.85rem; font-weight: 600; color: #059669; margin-top: 0.2rem;">
+                  Direct Phone: +1 (555) 019-2834
+                </div>
+              </div>
+            </div>
+
+            <div class="driver-actions">
+              <a id="btn-call-driver" href="tel:+15550192834" class="btn-call">
+                Call Driver Direct
+              </a>
+              <button type="button" class="btn btn-outline btn-sm" onclick="TrackingApp.shareTrackingLink()">
+                Share Tracking
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Universal Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; margin-bottom: 2rem;">
+        <div>
+          <div class="brand" style="color: white; margin-bottom: 1rem;">
+            <div class="brand-text">RESQ<span>CARE</span></div>
+          </div>
+          <p style="font-size: 0.875rem; color: #94a3b8;">
+            Advanced Emergency Vehicle Dispatch, Real-Time Telemetry Tracking and Hospital Allocation Platform.
+          </p>
+        </div>
+        <div>
+          <h4 style="color: white; margin-bottom: 1rem; font-size: 0.95rem;">Quick Navigation</h4>
+          <ul style="list-style: none; display: flex; flex-direction: column; gap: 0.5rem; font-size: 0.875rem;">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="booking.html">Book Ambulance</a></li>
+            <li><a href="tracking.html">Track Location</a></li>
+            <li><a href="index.html#hospitals-section">Hospitals</a></li>
+            <li><a href="history.html">Booking History</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 style="color: white; margin-bottom: 1rem; font-size: 0.95rem;">Emergency Helplines</h4>
+          <p style="font-size: 0.85rem; color: #94a3b8; line-height: 1.8;">
+            Central Dispatch: 108<br>
+            Direct Helpline: +1-800-555-0199<br>
+            Triage Desk: +1-800-555-0144
+          </p>
+        </div>
+      </div>
+      <div style="text-align: center; border-top: 1px solid #1e293b; padding-top: 1.5rem; font-size: 0.8rem;">
+        &copy; 2026 RESQCARE. All rights reserved.
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/notifications.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/tracking.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      if (!Auth.requireAuth()) return;
+      UI.renderNavbar('tracking');
+      TrackingApp.initFromURL();
+    });
+  </script>
+</body>
+</html>

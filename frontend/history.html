@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Booking History - RESQCARE</title>
+  <meta name="description" content="Review your ambulance dispatch records, assigned vehicles, trip progression history, and receipts.">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="js/auth.js"></script>
+  <script>
+    if (!Auth.isAuthenticated()) {
+      window.location.replace('login.html?redirect=history.html');
+    }
+  </script>
+</head>
+<body>
+
+  <!-- Dynamic Navbar -->
+  <div id="navbar-container"></div>
+
+  <div class="container" style="margin: 1.5rem auto 2.5rem auto;">
+    <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 1rem; margin-bottom: 1.25rem;">
+      <div>
+        <span style="font-size: 0.775rem; font-weight: 700; color: #1e3a8a; text-transform: uppercase;">Records</span>
+        <h1 style="font-size: 1.5rem; font-weight: 800; color: #0f172a; margin-top: 0.2rem;">My Booking History</h1>
+        <p style="color: #64748b; font-size: 0.845rem; margin-top: 0.2rem;">Complete record of previous ambulance requests, assigned vehicles, and invoices</p>
+      </div>
+      <div>
+        <a href="booking.html" class="btn btn-danger btn-sm" style="font-size: 0.8125rem;">New Booking</a>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="card" style="margin-bottom: 1.5rem; padding: 1.25rem;">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+        <div>
+          <label class="form-label" for="search-code">Search Code / Patient</label>
+          <input type="text" id="search-code" class="form-control" placeholder="Search reference code...">
+        </div>
+        <div>
+          <label class="form-label" for="filter-status">Filter by Status</label>
+          <select id="filter-status" class="form-control">
+            <option value="">All Statuses</option>
+            <option value="COMPLETED">Completed</option>
+            <option value="CANCELLED">Cancelled</option>
+            <option value="ON_THE_WAY">In Progress</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- History Table -->
+    <div class="card">
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Date & Code</th>
+              <th>Patient Details</th>
+              <th>Pickup Address</th>
+              <th>Hospital / Destination</th>
+              <th>Ambulance</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="history-tbody">
+            <tr>
+              <td colspan="7" style="text-align: center; color: #64748b; padding: 3rem;">
+                Loading booking history records...
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/notifications.js"></script>
+  <script src="js/ui.js"></script>
+  <script>
+    let bookingsList = [];
+
+    async function loadHistory() {
+      const tbody = document.getElementById('history-tbody');
+      try {
+        bookingsList = await api.get('/bookings');
+        renderHistory();
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #dc2626; padding: 2rem;">Failed to load history: ${err.message}</td></tr>`;
+      }
+    }
+
+    function renderHistory() {
+      const search = document.getElementById('search-code').value.toLowerCase().trim();
+      const statusFilter = document.getElementById('filter-status').value;
+      const tbody = document.getElementById('history-tbody');
+
+      let filtered = bookingsList.filter(b => {
+        if (statusFilter && b.bookingStatus !== statusFilter) return false;
+        if (search) {
+          const matchCode = b.bookingCode && b.bookingCode.toLowerCase().includes(search);
+          const matchPatient = b.patientName && b.patientName.toLowerCase().includes(search);
+          if (!matchCode && !matchPatient) return false;
+        }
+        return true;
+      });
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #64748b; padding: 3rem;">No matching booking records found.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(b => `
+        <tr>
+          <td>
+            <strong>${b.bookingCode}</strong>
+            <div style="font-size: 0.75rem; color: #94a3b8;">${UI.formatDate(b.createdAt)}</div>
+          </td>
+          <td>
+            <strong>${b.patientName}</strong>
+            <div style="font-size: 0.75rem; color: #64748b;">${b.patientPhone}</div>
+          </td>
+          <td style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+            ${b.pickupAddress}
+          </td>
+          <td style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+            ${b.destinationAddress || b.hospitalName || 'Emergency Center'}
+          </td>
+          <td>
+            ${b.ambulanceNumber ? `<strong>${b.ambulanceNumber}</strong> (${b.ambulanceType})` : '<span style="color: #94a3b8;">N/A</span>'}
+          </td>
+          <td>${UI.formatStatusBadge(b.bookingStatus)}</td>
+          <td>
+            <a href="tracking.html?id=${b.id}" class="btn btn-outline btn-sm">Track Location</a>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      if (!Auth.requireAuth()) return;
+      UI.renderNavbar('history');
+      loadHistory();
+
+      document.getElementById('search-code').addEventListener('input', renderHistory);
+      document.getElementById('filter-status').addEventListener('change', renderHistory);
+    });
+  </script>
+</body>
+</html>

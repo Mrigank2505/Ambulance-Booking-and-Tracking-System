@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact Emergency Dispatch - RESQCARE</title>
+  <meta name="description" content="Contact RESQCARE central dispatch, emergency helplines, hospital triage network, and operational support.">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="js/auth.js"></script>
+  <script>
+    if (!Auth.isAuthenticated()) {
+      window.location.replace('login.html?redirect=contact.html');
+    }
+  </script>
+</head>
+<body>
+
+  <!-- Universal Dynamic Navigation Bar -->
+  <div id="navbar-container"></div>
+
+  <main class="container" style="max-width: 1080px; margin: 1.5rem auto 2.5rem auto;">
+    <div style="margin-bottom: 1.25rem; text-align: center;">
+      <span style="font-size: 0.775rem; font-weight: 700; color: #1e3a8a; text-transform: uppercase; letter-spacing: 0.05em;">24/7 Operations Support</span>
+      <h1 style="font-size: 1.5rem; font-weight: 800; color: #0f172a; margin-top: 0.25rem;">Contact RESQCARE</h1>
+      <p style="color: #64748b; font-size: 0.845rem; max-width: 620px; margin: 0.25rem auto 0 auto;">
+        Reach our centralized medical response center for urgent dispatch coordination, hospital network assistance, or operational inquiries.
+      </p>
+    </div>
+
+    <!-- Emergency Helplines Banner -->
+    <div style="background: #fef2f2; border: 2px solid #fecaca; border-radius: var(--radius-md); padding: 1rem 1.25rem; margin-bottom: 1.25rem;">
+      <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem;">
+        <div>
+          <span class="badge badge-critical" style="margin-bottom: 0.35rem; font-size: 0.7rem;">Life-Threatening Emergency</span>
+          <h2 style="font-size: 1.05rem; font-weight: 800; color: #991b1b; margin-bottom: 0.2rem;">National Emergency Helplines</h2>
+          <p style="color: #7f1d1d; font-size: 0.8125rem; margin: 0;">Immediate connection to regional trauma control and paramedic dispatch units.</p>
+        </div>
+        <div style="display: flex; flex-wrap: wrap; gap: 0.75rem;">
+          <a href="tel:108" class="btn btn-danger" style="font-weight: 700; padding: 0.5rem 1rem; font-size: 0.85rem;">Call 108</a>
+          <a href="booking.html" class="btn btn-primary" style="font-weight: 600; padding: 0.5rem 1rem; font-size: 0.85rem;">Online Emergency Booking</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2-Column Contact Info and Form -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.25rem;">
+      <!-- Operational Desks Info -->
+      <div>
+        <div class="card" style="margin-bottom: 1rem; padding: 1.15rem;">
+          <h3 style="font-size: 0.95rem; font-weight: 700; color: #0f172a; margin-bottom: 0.75rem;">Direct Operations Lines</h3>
+          
+          <div style="margin-bottom: 0.85rem;">
+            <strong style="display: block; font-size: 0.775rem; color: #64748b; text-transform: uppercase;">Central Ambulance Control</strong>
+            <p style="font-size: 0.95rem; font-weight: 700; color: #0f172a; margin-top: 0.15rem; margin-bottom: 0.15rem;">+1-800-555-0199</p>
+            <span style="font-size: 0.775rem; color: #059669;">Available 24 hours / 365 days</span>
+          </div>
+
+          <div style="margin-bottom: 0.85rem; border-top: 1px solid #e2e8f0; padding-top: 0.75rem;">
+            <strong style="display: block; font-size: 0.775rem; color: #64748b; text-transform: uppercase;">Hospital Inter-Facility Coordination</strong>
+            <p style="font-size: 0.95rem; font-weight: 700; color: #0f172a; margin-top: 0.15rem; margin-bottom: 0.15rem;">+1-800-555-0144</p>
+            <span style="font-size: 0.775rem; color: #64748b;">Direct liaison for trauma triage and bed confirmation</span>
+          </div>
+
+          <div style="border-top: 1px solid #e2e8f0; padding-top: 0.75rem;">
+            <strong style="display: block; font-size: 0.775rem; color: #64748b; text-transform: uppercase;">Central Email Inquiries</strong>
+            <p style="font-size: 0.9rem; font-weight: 700; color: #1e3a8a; margin-top: 0.15rem; margin-bottom: 0.15rem;">dispatch@resqcare.org</p>
+            <span style="font-size: 0.775rem; color: #64748b;">Non-emergency administrative and verification requests</span>
+          </div>
+        </div>
+
+        <div class="card" style="padding: 1.15rem;">
+          <h3 style="font-size: 0.95rem; font-weight: 700; color: #0f172a; margin-bottom: 0.5rem;">Command Headquarters</h3>
+          <p style="color: #475569; font-size: 0.845rem; line-height: 1.5; margin: 0;">
+            RESQCARE Operations Center<br>
+            Building 4, Central Health District<br>
+            Metro Medical Corridor, Suite 100
+          </p>
+        </div>
+      </div>
+
+      <!-- Inquiries Message Form -->
+      <div>
+        <div class="card" style="padding: 1.25rem;">
+          <h3 style="font-size: 0.95rem; font-weight: 700; color: #0f172a; margin-bottom: 0.35rem;">Send an Inquiry</h3>
+          <p style="color: #64748b; font-size: 0.8125rem; margin-bottom: 1rem;">
+            Submit non-emergency general questions, feedback, or hospital fleet partnership requests.
+          </p>
+
+          <form id="contact-form" onsubmit="handleContactSubmit(event)">
+            <div class="form-group">
+              <label class="form-label" for="contact-name">Full Name *</label>
+              <input type="text" id="contact-name" class="form-control" placeholder="Your full name" required>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="contact-phone">Contact Phone *</label>
+                <input type="tel" id="contact-phone" class="form-control" placeholder="Contact number" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="contact-email">Email Address *</label>
+                <input type="email" id="contact-email" class="form-control" placeholder="name@domain.com" required>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="contact-subject">Inquiry Subject *</label>
+              <select id="contact-subject" class="form-control" required>
+                <option value="">Select subject category</option>
+                <option value="GENERAL">General Information</option>
+                <option value="BILLING">Trip Receipt or Billing</option>
+                <option value="HOSPITAL">Hospital Facility Partnership</option>
+                <option value="FEEDBACK">Service Feedback or Complaint</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="contact-message">Message *</label>
+              <textarea id="contact-message" class="form-control" rows="4" placeholder="Detail your request or inquiry..." required></textarea>
+            </div>
+
+            <button type="submit" id="btn-contact-submit" class="btn btn-primary" style="width: 100%; min-height: 48px;">
+              Submit Inquiry
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Universal Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; margin-bottom: 2rem;">
+        <div>
+          <div class="brand" style="color: white; margin-bottom: 1rem;">
+            <div class="brand-text">RESQ<span>CARE</span></div>
+          </div>
+          <p style="font-size: 0.875rem; color: #94a3b8;">
+            Advanced Emergency Vehicle Dispatch, Real-Time Telemetry Tracking and Hospital Allocation Platform.
+          </p>
+        </div>
+        <div>
+          <h4 style="color: white; margin-bottom: 1rem; font-size: 0.95rem;">Quick Navigation</h4>
+          <ul style="list-style: none; display: flex; flex-direction: column; gap: 0.5rem; font-size: 0.875rem;">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="booking.html">Book Ambulance</a></li>
+            <li><a href="tracking.html">Track Location</a></li>
+            <li><a href="index.html#hospitals-section">Hospitals</a></li>
+            <li><a href="history.html">Booking History</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 style="color: white; margin-bottom: 1rem; font-size: 0.95rem;">Emergency Helplines</h4>
+          <p style="font-size: 0.85rem; color: #94a3b8; line-height: 1.8;">
+            Central Dispatch: 108<br>
+            Direct Helpline: +1-800-555-0199<br>
+            Triage Desk: +1-800-555-0144
+          </p>
+        </div>
+      </div>
+      <div style="text-align: center; border-top: 1px solid #1e293b; padding-top: 1.5rem; font-size: 0.8rem;">
+        &copy; 2026 RESQCARE. All rights reserved.
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/notifications.js"></script>
+  <script src="js/ui.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      if (!Auth.requireAuth()) return;
+      UI.renderNavbar('contact');
+    });
+
+    function handleContactSubmit(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btn-contact-submit');
+      UI.setButtonLoading(btn, true, 'Submitting...');
+      setTimeout(() => {
+        UI.setButtonLoading(btn, false);
+        UI.showToast('Thank you. Your inquiry has been received by our operations team.', 'success');
+        document.getElementById('contact-form').reset();
+      }, 800);
+    }
+  </script>
+</body>
+</html>

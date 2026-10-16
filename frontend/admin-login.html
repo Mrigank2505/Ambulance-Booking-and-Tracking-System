@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Portal Login - RESQCARE</title>
+  <meta name="description" content="Secure management and dispatch control portal for RESQCARE administrators and fleet supervisors.">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    .admin-auth-container {
+      max-width: 480px;
+      margin: 3.5rem auto 4rem auto;
+      padding: 0 1rem;
+    }
+    .admin-card {
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-top: 5px solid #1e3a8a;
+      border-radius: var(--radius-md);
+      box-shadow: 0 15px 30px -10px rgba(15, 23, 42, 0.18);
+      padding: 2.25rem;
+    }
+    .admin-badge {
+      margin: 0 auto 1rem auto;
+      width: 52px;
+      height: 52px;
+      border-radius: 12px;
+      background: #eff6ff;
+      color: #1e3a8a;
+      font-weight: 800;
+      font-size: 1.15rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid #bfdbfe;
+    }
+    .password-field-container {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .password-field-container input {
+      padding-right: 4.5rem;
+    }
+    .password-toggle-btn {
+      position: absolute;
+      right: 0.5rem;
+      background: transparent;
+      border: none;
+      color: #64748b;
+      font-size: 0.825rem;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 0.35rem 0.6rem;
+      border-radius: 4px;
+      transition: background-color 0.15s ease, color 0.15s ease;
+    }
+    .password-toggle-btn:hover {
+      background: #f1f5f9;
+      color: #0f172a;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Fixed Navigation Bar -->
+  <div id="navbar-container"></div>
+
+  <main class="container admin-auth-container">
+    <div class="admin-card">
+      <div style="text-align: center; margin-bottom: 2rem;">
+        <div class="admin-badge" aria-hidden="true">
+          <svg style="width: 26px; height: 26px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+          </svg>
+        </div>
+        <h1 style="font-size: 1.45rem; font-weight: 800; color: #0f172a; margin: 0 0 0.35rem 0;">
+          Command Center Access
+        </h1>
+        <p style="color: #64748b; font-size: 0.875rem; margin: 0;">
+          Administrator credentials required for fleet monitoring, hospital triage & system configuration.
+        </p>
+      </div>
+
+      <!-- Security / Alert Container -->
+      <div id="admin-login-alert" class="alert alert-danger" style="display: none; margin-bottom: 1.25rem;" role="alert"></div>
+
+      <form id="admin-login-form" novalidate>
+        <div class="form-group">
+          <label class="form-label" for="admin-email">Admin Email or Username</label>
+          <input 
+            type="text" 
+            id="admin-email" 
+            name="email"
+            class="form-control" 
+            placeholder="e.g. admin@ambulance.com" 
+            required 
+            autofocus 
+            autocomplete="username"
+          >
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="admin-password">Administrator Password</label>
+          <div class="password-field-container">
+            <input 
+              type="password" 
+              id="admin-password" 
+              name="password"
+              class="form-control" 
+              placeholder="••••••••" 
+              required 
+              autocomplete="current-password"
+            >
+            <button 
+              type="button" 
+              id="btn-toggle-admin-password" 
+              class="password-toggle-btn" 
+              aria-label="Toggle password visibility" 
+              onclick="toggleAdminPassword()"
+            >
+              Show
+            </button>
+          </div>
+        </div>
+
+        <button type="submit" id="btn-admin-submit" class="btn btn-primary" style="width: 100%; margin-top: 0.5rem; padding: 0.8rem; font-weight: 700; background: #1e3a8a; border-color: #1e3a8a;">
+          Authenticate as Administrator
+        </button>
+      </form>
+
+      <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 0.85rem; margin-top: 1.75rem; font-size: 0.8rem; color: #64748b; line-height: 1.5;">
+        <strong style="color: #0f172a; display: block; margin-bottom: 0.2rem;">Restricted Government / EMS Portal</strong>
+        All system operations, dispatch overrides, and driver management events are cryptographically audited.
+      </div>
+
+      <div style="text-align: center; margin-top: 1.25rem; font-size: 0.85rem; color: #64748b;">
+        <a href="login.html" style="color: #1e3a8a; font-weight: 600; text-decoration: none;">&larr; Return to Patient Portal</a>
+        <span style="margin: 0 0.5rem; color: #cbd5e1;">|</span>
+        <a href="driver-login.html" style="color: #1e3a8a; font-weight: 600; text-decoration: none;">Driver Cockpit &rarr;</a>
+      </div>
+    </div>
+  </main>
+
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/notifications.js"></script>
+  <script src="js/validation.js"></script>
+  <script src="js/ui.js"></script>
+  <script>
+    function toggleAdminPassword() {
+      const field = document.getElementById('admin-password');
+      const btn = document.getElementById('btn-toggle-admin-password');
+      if (!field || !btn) return;
+      if (field.type === 'password') {
+        field.type = 'text';
+        btn.textContent = 'Hide';
+        btn.setAttribute('aria-label', 'Hide password');
+      } else {
+        field.type = 'password';
+        btn.textContent = 'Show';
+        btn.setAttribute('aria-label', 'Show password');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // Check if user is already authenticated as ADMIN
+      if (Auth.isAuthenticated() && Auth.hasRole('ADMIN')) {
+        window.location.replace('admin-dashboard.html');
+        return;
+      }
+
+      UI.renderNavbar('admin-login');
+
+      let isSubmitting = false;
+      const form = document.getElementById('admin-login-form');
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (isSubmitting) return;
+
+        Validation.clearAllErrors(form);
+
+        const email = document.getElementById('admin-email').value.trim();
+        const password = document.getElementById('admin-password').value;
+        const alertEl = document.getElementById('admin-login-alert');
+        alertEl.style.display = 'none';
+
+        let isValid = true;
+        if (!email) {
+          Validation.showFieldError(document.getElementById('admin-email'), 'Please enter admin email or username');
+          isValid = false;
+        }
+        if (!password) {
+          Validation.showFieldError(document.getElementById('admin-password'), 'Please enter admin password');
+          isValid = false;
+        }
+
+        if (!isValid) return;
+
+        const submitBtn = document.getElementById('btn-admin-submit');
+        isSubmitting = true;
+        UI.setButtonLoading(submitBtn, true, 'Verifying Credentials...');
+
+        try {
+          const user = await Auth.login(email, password);
+
+          // Enforce role-based authorization: user must have ADMIN role
+          if (user.role !== 'ADMIN') {
+            // Invalidate session immediately without reloading page
+            Auth.clearSession();
+            isSubmitting = false;
+            UI.setButtonLoading(submitBtn, false);
+            alertEl.className = 'alert alert-danger';
+            alertEl.textContent = 'Access Denied: This portal is strictly restricted to System Administrators and EMS Dispatch Chiefs.';
+            alertEl.style.display = 'block';
+            return;
+          }
+
+          UI.showToast(`Admin Access Granted. Welcome, ${user.fullName}!`, 'success');
+          setTimeout(() => {
+            window.location.replace('admin-dashboard.html');
+          }, 450);
+        } catch (err) {
+          isSubmitting = false;
+          UI.setButtonLoading(submitBtn, false);
+          alertEl.className = 'alert alert-danger';
+          alertEl.textContent = err.message || 'Invalid administrator credentials. Please try again.';
+          alertEl.style.display = 'block';
+        }
+      });
+    });
+  </script>
+</body>
+</html>
